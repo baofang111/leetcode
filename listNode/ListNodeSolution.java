@@ -231,5 +231,38 @@ public class ListNodeSolution {
         return false;
     }
 
+    /**
+     * 相交链表
+     *
+     * - 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 null 。
+     * - 图示两个链表在节点 c1 开始相交：
+     *
+     *  解法：
+     *    直接使用两个指针。分别从 A B 的开始节点往前走，
+     *
+     *
+     * @param headA
+     * @param headB
+     * @return
+     */
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode p1 = headA;
+        ListNode p2 = headB;
+
+        while (p1 != p2) {
+            if (p1 == null) {
+                p1 = headB;
+            }else {
+                p1 = p1.next;
+            }
+            if (p2 == null) {
+                p2 = headA;
+            } else {
+                p2 = p2.next;
+            }
+        }
+
+        return p1;
+    }
 
 }
