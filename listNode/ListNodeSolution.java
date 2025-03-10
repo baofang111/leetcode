@@ -299,4 +299,35 @@ public class ListNodeSolution {
         return p1;
     }
 
+    /**
+     * 83 - 删除链表中重复的元素
+     *  和 数组的重复元素一样，使用双指针即可
+     *
+     *      1 1 2 3 3 ---> 1 2 3
+     *
+     * @param head
+     * @return
+     */
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+
+        while (fast != null) {
+            if (slow.val != fast.val) {
+                slow.next = fast;
+
+                slow = slow.next;
+            }
+            fast = fast.next;
+        }
+
+        slow.next = null;
+
+        return head;
+    }
+
 }
