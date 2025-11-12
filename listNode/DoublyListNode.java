@@ -9,4 +9,9 @@ package listNode;
  * @since: 2025/2/25 13:36
  */
 public class DoublyListNode {
+
+    int val;
+    DoublyListNode next, prev;
+    DoublyListNode(int x) { val = x; }
+
 }
