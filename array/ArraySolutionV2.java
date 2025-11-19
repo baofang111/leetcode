@@ -3,6 +3,8 @@ package array;
 import com.sun.tools.javac.Main;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 刷题 第二版
@@ -330,6 +332,108 @@ public class ArraySolutionV2 {
         }
 
         return true;
+    }
+
+    /**
+     * 28 = 找出字符串中 第一个匹配项的下标
+     *
+     * 通过拆解去判断
+     *
+     * @param haystack
+     * @param needle
+     * @return
+     */
+    public int strStr(String haystack, String needle) {
+        if (haystack == null || needle == null) {
+            return -1;
+        }
+
+        int length = haystack.length();
+        int needLength = needle.length();
+
+        for (int i = 0; i <= length - needLength ; i++) {
+            if (haystack.substring(i).startsWith(needle)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * 68 - 文本左右对齐
+     * 给定一个单词数组 words 和一个长度 maxWidth ，重新排版单词，使其成为每行恰好有 maxWidth 个字符，且左右两端对齐的文本。
+     *
+     * 你应该使用 “贪心算法” 来放置给定的单词；也就是说，尽可能多地往每行中放置单词。必要时可用空格 ' ' 填充，使得每行恰好有 maxWidth 个字符。
+     *
+     * 输入: words = ["This", "is", "an", "example", "of", "text", "justification."], maxWidth = 16
+     * 输出:
+     * [
+     *    "This    is    an",
+     *    "example  of text",
+     *    "justification.  "
+     * ]
+     *
+     *  思路，我们啊按照题目的意思，大概可以将该题的思路进行一下拆分
+     *  1: 遍历 words ,当前位置 或者 + 下一个位置，不断的 while 迭代，找到 第一个 地方 可以装的最大的 单词位置
+     *  2：我们需要 判断出来 这个地方 总共可以 装 多少单词
+     *  3：有了 可以装多少单词，我们就可以计算出来 需要多少空格 总单词数量 - 1 （ 这是个临界条件 一定需要判断）
+     *  4：这里有了分支判断
+     *      4-1：如果单词 需要的空格 = 0，或者是 已经到了最后一个单词了的华，直接邹题目逻辑的 最左原则，后续补全即可
+     *      4-2： 如果不是最后一个未知 或者 gap ！= 0，那么我们邹的是中间的逻辑，这时候需要注意的点就是 我们的空格 需要均分给 每个单词
+     *          举个例子： 6个空格，4个单词，我们每一个单词之间的空格需要  6 /（4 - 1）= 2 个，如果有 7个空格，4 个单词，我们需要把
+     *          多的那个空格，按照顺序 分掉，这个空格不能放后面
+     *  5：移动我们需要找的下一个未知，再次遍历
+     *
+     * @param words
+     * @param maxWidth
+     * @return
+     */
+    public List<String> fullJustify(String[] words, int maxWidth) {
+        if (words == null) {
+            return null;
+        }
+
+        List<String> res = new LinkedList<>();
+
+        int n = words.length;
+        int index = 0;
+
+        // 我们开始遍历所有的单词
+        while (index < n) {
+             // step1 记录单词位置
+            int startLength = words[index].length();
+            // 下一个单词的未知
+            int last = index + 1;
+            // 不断的迭代 寻找我们可以找到的最大值
+            while ((startLength + 1 + words[last].length()) <= maxWidth ) {
+                startLength += 1 + words[last].length();
+                last++;
+            }
+
+            // 到这里 我们就到了第二步，我们要开始瓶装了
+            StringBuilder sb = new StringBuilder();
+            // 单词数量
+            int wordCount = last - index;
+            // 拼接需要的空格数
+            int gap = wordCount - 1;
+
+            // 分支拼接
+            if (gap == 0 || last == n) {
+                // 左对齐 + 空格单个分布 + 尾部空格补全
+
+
+            } else {
+                // 空格均分
+            }
+
+            res.add(sb.toString());
+
+            index = last;
+
+        }
+
+
     }
 
 
