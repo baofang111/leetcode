@@ -158,7 +158,7 @@ public class SlidingWindowSolutionV2 {
         int right = 1;
         int n = s.length();
 
-        for (int i = o; i <n; i++) {
+        for (int i = 0; i <n; i++) {
 
             while (right < n && hasWindow(s.substring(i, right), t)) {
 
@@ -174,8 +174,10 @@ public class SlidingWindowSolutionV2 {
         char[] charArray = subS.toCharArray();
 
         for (int i = 0; i < t.length(); i++) {
-            if (charArray.)
+
         }
+
+        return false;
     }
 
 }
