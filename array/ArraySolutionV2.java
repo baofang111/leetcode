@@ -2,11 +2,7 @@ package array;
 
 import com.sun.tools.javac.Main;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 刷题 第二版
@@ -900,6 +896,70 @@ public class ArraySolutionV2 {
         }
 
         return result.toString();
+    }
+
+
+    /**
+     * 15 - 三数之和
+     *
+     * 解法：和 有序 两数之和有点类似，我们首先对 数组惊喜排序，
+     * 然后 适用 双指针，固定柱中间，然后 我们适用双指针移动 左右两段，去判断即可
+     * 就是一题变种的 双数只喝
+     *
+     * @param nums
+     * @return
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        if (nums == null || nums.length < 3) {
+            return Collections.emptyList();
+        }
+
+        Arrays.sort(nums);
+
+        List<List<Integer>> res = new ArrayList<>();
+        int n = nums.length;
+
+        for (int i = 0; i < n - 2; i++) {
+            // 肯定已经判定完了
+            if (nums[i] > 0) {
+                continue;
+            }
+            // 相同数据，继续往下走
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            int left = i + 1;
+            int right = n - 1;
+
+            while (left < right) {
+                // 开始进行值判断
+                int sum = nums[i] + nums[left] + nums[right];
+                if (sum == 0) {
+                    res.add(Arrays.asList(nums[i], nums[left], nums[right]));
+
+                    // 注意 假如这里面 left 和 right 的前后值相等，我们也需要进行跳过,这一步非常非常重要
+                    while (left < right && nums[left] == nums[left+1]) {
+                        left++;
+                    }
+                    while (left < right && nums[right] == nums[right-1]) {
+                        right--;
+                    }
+
+                    // 跑完之后 这里需要改变指针，不然就会死循环
+                    left++;
+                    right--;
+                } else if (sum < 0) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+
+        }
+
+        return res;
+
     }
 
 }
