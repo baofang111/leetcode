@@ -2,6 +2,7 @@ package qujian;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -211,6 +212,50 @@ public class QujianSolution {
         }
 
         return res.toArray(new int[res.size()][]);
+    }
+
+    /**
+     * 452. 用最少数量的箭引爆气球
+     * 输入：points = [[10,16],[2,8],[1,6],[7,12]]
+     * 输出：2
+     * 解释：气球可以用2支箭来爆破:
+     * -在x = 6处射出箭，击破气球[2,8]和[1,6]。
+     * -在x = 11处发射箭，击破气球[10,16]和[7,12]。
+     *
+     * 思路：对 points 排序 后, 我们初始 一个箭
+     * 然后一定要拍戏，当我们的 下一个 开始 > 上一个结束的话，那么就需要额外的一个箭
+     * 以此类推
+     *
+     * @param points
+     * @return
+     */
+    public int findMinArrowShots(int[][] points) {
+        if (points == null || points.length == 0) {
+            return 0;
+        }
+
+        // 一定要排序
+        // TODO 这里有有溢出风险 如果我的数据是这样的华 [[-2147483646,-2147483645],[2147483646,2147483647]]
+        // 应该改成这样写 Comparator.comparingInt(a -> a[1])  内部实现是这个 return (x < y) ? -1 : ((x == y) ? 0 : 1); 不会溢出
+//        Arrays.sort(points, (a, b) -> a[0] - b[0]);
+        Arrays.sort(points, Comparator.comparingInt(a -> a[1]));
+        int res = 1;
+        int curEnd = points[0][1];
+
+        // 我们从第二个位置开始遍历
+        for (int i = 1; i < points.length; i++) {
+            int start = points[i][0];
+            int end = points[i][1];
+
+            // 如果当前 开始大于上一个结束的话，那么需要多一把箭
+            if (start > curEnd) {
+                res++;
+                // 记住更新我们的 curEnd
+                curEnd = end;
+            }
+        }
+
+        return res;
     }
 
 }
