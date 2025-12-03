@@ -1,5 +1,7 @@
 package Stack;
 
+import listNode.ListNodeTest;
+
 import java.util.*;
 
 /**
@@ -166,6 +168,7 @@ public class StackSolution2 {
         return stack.peek();
     }
 
+
     /**
      * 224 - 基本计算器
      * 给你一个字符串表达式 s ，请你实现一个基本计算器来计算并返回它的值。
@@ -174,11 +177,22 @@ public class StackSolution2 {
      * 输入：s = "(1+(4+5+2)-3)+(6+8)"
      * 输出：23
      *
-     * 解法：
+     * 解法：（ gaiti ）
      *  核心其实就是几点：
-     *  1：我们不断的 将字符往 栈上面添加
-     *  2：当 遇到 ")" 的时候 我们要遍历，找到 最近的一个上一次的对应的 "(" 然后计算他们的值，然后将他们重新入栈
-     *  3：不断计算 就可以得到我们要的结果
+     *  1：我们顺序扫描，用两个变量存储 当前的运算状态
+     *   - result: 当前的累计的结果
+     *   - sign: 当前符号 （1 表示 + ，-1 表示 -1）
+     *  2：当遇到 （ 用栈保存状态
+     *      推入当前 result 和 sign, 重置计算环境
+     *      1 - （4 + 5）
+     *  3：遇到 ）弹栈恢复括号前的环境
+     *      括号内结果计算完毕，比例：
+     *          （4 + 5）= 9
+     *   栈顶包含
+     *      上一层 result
+     *      上一层 sign
+     *   结合还原
+     *      result = pre_result + pre_sign * 当前括号结果
      *
      * @param s
      * @return
@@ -186,18 +200,55 @@ public class StackSolution2 {
     public int calculate(String s) {
         s = s.replace(" ", "");
 
-        char[] charArray = s.toCharArray();
-        Deque<String> stack = new ArrayDeque<>();
+        // 该题目的核心 就是 我们不断的遍历 针对 + - （ ） 做分别的处理，且一定要有三个数据去记录我们计算的中途结果，num result sign
 
+        // 解析到的 数字
+        int num = 0;
+        // 当前计算到的结果 统计
+        int result = 0;
+        // 当前的计算编号 + 1 - -1
+        int sign = 1;
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        char[] charArray = s.toCharArray();
         for (Character c : charArray) {
-            if (')' == c) {
-                // 开始不断的往前找
-            } else {
-               // 也有可能没有
+            if (Character.isDigit(c)) {
+                // 处理数字
+                num = num * 10 + (c - '0');
+            } else if (c == '+') {
+                //  + 号的话，我们需要记录 该 + 号状态，并且重置 sign 和 num 的数据
+                result += sign * num;
+                num = 0;
+                sign = 1;
+            }else if (c == '-') {
+                // 和 - 相反
+                result += sign * num;
+                num = 0;
+                sign = -1;
+            }else if (c == '(') {
+                // 这里我们需要 把上面记录的数据 进行存储到栈里面，方便后面的计算
+                // 举个例子 1 + （3 + 4） 我们要把 1 + 记录下来，然后 在 ) 处理好 3+4 的时候再和他进行计算
+                stack.push(result);
+                stack.push(sign);
+
+                // 需要重置环境
+                result = 0;
+                sign = 1;
+
+                // 注意 这里面是不需要计算的，只需要将 之前的计算结果 进行 入栈
+            }else if (c == ')') {
+                // 我们 需要对 （ ） 中间的数据 进行汇总,也就是 不断累加 （ ）中的 result ，然后对 1 + 进行重新累加计算
+                result += sign * num;
+                num = 0;
+
+                Integer preSign = stack.pop();
+                Integer preResult = stack.pop();
+
+                result = result + preResult * preSign;
             }
         }
 
-        return 0;
+        return result + num * sign;
     }
 
 
@@ -206,7 +257,8 @@ public class StackSolution2 {
 
         String[] tokens = {"2", "1", "+", "3", "*"};
 
-        int i = solution.evalRPN(tokens);
+
+        int i = solution.calculate("1 + 1");
         System.out.println(i);
     }
 
