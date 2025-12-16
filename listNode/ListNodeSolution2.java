@@ -519,6 +519,51 @@ public class ListNodeSolution2 {
         return newNode;
     }
 
+    /**
+     * 86 - 分隔链表
+     *  给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
+     *
+     *  输入：head = [1,4,3,2,5,2], x = 3
+     *  输出：[1,2,2,4,3,5]
+     *
+     *  解法：我们使用两个虚拟头结点，分别存储 小于 X 和 大于 X 的，然后 将这两个进行合并即可
+     *
+     * @param head
+     * @param x
+     * @return
+     */
+    public ListNode partition(ListNode head, int x) {
+        ListNode dummy1 = new ListNode(0);
+        ListNode dummy2 = new ListNode(0);
+
+        ListNode p = head;
+
+        ListNode d1 = dummy1;
+        ListNode d2 = dummy2;
+
+        while (p != null) {
+            int val = p.val;
+            if (val < x) {
+                d1.next = p;
+                d1 = d1.next;
+            } else {
+                d2.next = p;
+                d2 = d2.next;
+            }
+
+            // 指针往后移动，但是这里我们需要注意的是，我们要把指针掐断
+            ListNode temp = p.next;
+            // 这里不能使用 temp.next = null, 因为会造成后续的链表丢失
+            p.next = null;
+            p = temp;
+        }
+
+        // 合并两个链表
+        d1.next = dummy2.next;
+
+        return dummy1.next;
+    }
+
     public static void main(String[] args) {
         System.out.println(10 / 10);
     }
