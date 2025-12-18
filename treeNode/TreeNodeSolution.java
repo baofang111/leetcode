@@ -166,16 +166,14 @@ public class TreeNodeSolution {
      * @return
      */
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        // 记录 中序遍历的 [值，值index] 用来遍历寻找左右节点
         Map<Integer, Integer> map = new HashMap<>();
-
         int inLength = inorder.length;
         for (int i = 0; i < inLength; i++) {
             map.put(inorder[i], i);
         }
 
-        // 开始构建 二叉树
         return buildTreeNode(preorder, 0, 0, inLength - 1, map);
+
     }
 
     /**
@@ -188,25 +186,147 @@ public class TreeNodeSolution {
      */
     private TreeNode buildTreeNode(int[] preorder, int rootIndex, int left, int right, Map<Integer, Integer> map) {
         if (left > right) {
-            // 已经遍历完成了
             return null;
         }
 
-        // 创建根节点
         int rootValue = preorder[rootIndex];
         TreeNode root = new TreeNode(rootValue);
 
-        // 我们有根节点之后，我们只需要在 map 中找到该根节点 在 中序遍历里面的 具体位置，然后 他的左右 就是 左右节点
+        // 我们需要获取到 rootValue 在 inorder 中序遍历的具体位置，这样可以更好的切粉左右叶子结点
         Integer inRootIndex = map.get(rootValue);
 
-        // 构建根节点的左右节点
-
-        // 左节点的构建条件是, 我们将 inRootIndex 所有左边的，也就是 inRootIndex - 1 和 left 的位置全部归根在左节点上面
-        // rootIndex + 1 一定是左节点的第一个 第一个节点
+        // 开始构建左右节点
         root.left = buildTreeNode(preorder, rootIndex + 1, left, inRootIndex - 1, map);
-        // 右节点的构建条件是：我们将过滤掉所有的左边节点，也就是新的 rootIndex = 当前根节点位置 - 左边的所有的位置长度 + 往前移动一位也就是前序遍历的第一个
         root.right = buildTreeNode(preorder, rootIndex + inRootIndex - left + 1, inRootIndex + 1, right, map);
 
         return root;
     }
+
+    /**
+     * 106. 从中序与后序遍历序列构造二叉树
+     * 中序：左 - 根 - 右
+     * 后序：左 - 右 - 根
+     * <p>
+     * 解法 和 105 题目 基本一样 我们使用不同的便利方式即可
+     * 首要目标，就是 找到这个根，前序遍历，根在第一个，后序遍历在 最后一个，所以我们倒序操作就行了
+     *
+     * @param inorder
+     * @param postorder
+     * @return
+     */
+    public TreeNode buildTree2(int[] inorder, int[] postorder) {
+       // 和 105 题目差不多，关键点同样是找根节点，只不过根节点，一个在最前面，一个在最后面
+        Map<Integer, Integer> map = new HashMap<>();
+        int inLength = inorder.length;
+        for (int i = 0; i < inLength; i++) {
+            map.put(inorder[i], i);
+        }
+
+        return buildTreeNode2(postorder, inLength - 1, 0, inLength - 1, map);
+    }
+
+    private TreeNode buildTreeNode2(int[] postorder, int rootIndex, int left, int right, Map<Integer, Integer> map) {
+        if (left > right) {
+            return null;
+        }
+
+        // 构建根节点
+        int rootValue = postorder[rootIndex];
+        TreeNode root = new TreeNode(rootValue);
+        Integer inRootIndex = map.get(rootValue);
+
+        // 构建左右节点，注意因为 后序，根节点的前面一个节点，一定是右节点，所以我们要先构建右节点，然后再构建左节点，顺序不能错
+        root.right = buildTreeNode2(postorder, rootIndex - 1, inRootIndex + 1, right, map);
+        root.left = buildTreeNode2(postorder, rootIndex - 1 - (right - inRootIndex), left, inRootIndex - 1, map);
+
+        return root;
+    }
+
+    /**
+     * 117. 填充每个节点的下一个右侧节点指针 II
+     * 填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL 。
+     *
+     * 思路，使用 队列，一层一层的 获取，然后重新构建即可
+     *
+     * @param root
+     * @return
+     */
+    public Node connect(Node root) {
+        // 使用队列 一层一层遍历，然后添加到他的 next 就行
+        if (root == null) {
+            return null;
+        }
+
+        // 使用队列存储
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+
+        // 开始遍历
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            // 这里一定需要保存上一个节点，并且先做后右的去遍历我们的树，这样，我们就可以直接使用 pre.next = cur 即可
+            Node pre = null;
+            for (int i = 0; i < size ; i++) {
+                Node cur = queue.poll();
+                if (pre != null) {
+                    pre.next = cur;
+                }
+
+                // 一定要进行替换
+                pre = cur;
+                if (cur.left != null) {
+                    queue.offer(cur.left);
+                }
+                if (cur.right != null) {
+                    queue.offer(cur.right);
+                }
+            }
+        }
+
+        return root;
+    }
+
+    /**
+     * 附带 下一个在指向的
+     */
+    public class Node {
+        int val;
+        Node left;
+        Node right;
+        Node next;
+    }
+
+    /**
+     * 114. 二叉树展开为链表
+     *
+     * 思路： 不断的遍历 一直找到 左节点 = null, 这时候在往上面找 该左节点的根节点，然后找他的右节点
+     * 使用 前序遍历 根 - 左 - 右 然后 left 全部设置为空，使用 right 指针
+     *
+     *  1：使用前序遍历
+     *  2：使用一个 pre 指针，这个非常重要
+     *  3：每访问一个节点，就把 当前节点放到 pre.right = cur 后面
+     *
+     * @param root
+     */
+    TreeNode pre = null;
+    public void flatten(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        if (pre != null) {
+            pre.right = root;
+            // 左节点一定要设置 为 空
+            pre.left = null;
+        }
+
+        // 前序遍历 这里千万 要将 root.left 和 root.right 拿出来，不然 递归的时候，会有问题
+        pre = root;
+        TreeNode left = root.left;
+        TreeNode right = root.right;
+
+        flatten(left);
+        flatten(right);
+    }
+
 }
