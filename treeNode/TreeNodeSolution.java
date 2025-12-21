@@ -644,7 +644,7 @@ public class TreeNodeSolution {
     List<Integer> sizes = new ArrayList<>();
 
     public List<Double> averageOfLevels2(TreeNode root) {
-        averageOfLevelsBfs(root, 0);
+        averageOfLevelsDfs(root, 0);
 
         List<Double> res = new ArrayList<>();
 
@@ -886,7 +886,7 @@ public class TreeNodeSolution {
     public boolean isValidBST(TreeNode root) {
         isValidBSTBFS(root);
         return isValidBST;
-    }
+    }
 
     public void isValidBSTBFS(TreeNode root) {
         if (root == null) {
