@@ -886,7 +886,7 @@ public class TreeNodeSolution {
     public boolean isValidBST(TreeNode root) {
         isValidBSTBFS(root);
         return isValidBST;
-    }
+    }
 
     public void isValidBSTBFS(TreeNode root) {
         if (root == null) {
