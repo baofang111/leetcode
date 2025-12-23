@@ -204,6 +204,7 @@ public class TuSolution {
      * @return
      */
     Map<Node, Node> map = new HashMap<>();
+
     public Node cloneGraph(Node node) {
         // 这里适用  DFS 去解答，注意，一定要创建一个Map 去保存 新旧 node 的关系，不然在环形 node 中 会死循环
         if (node == null) {
@@ -235,7 +236,7 @@ public class TuSolution {
      * @return
      */
     public Node cloneGraphBFS(Node node) {
-        if(node == null){
+        if (node == null) {
             return null;
         }
         // 适用 BFS 进行遍历，我们同样需要一个新老节点的 map
@@ -265,5 +266,161 @@ public class TuSolution {
 
         return map.get(node);
     }
+
+    /**
+     * 399. 除法求值
+     * <p>
+     * 题目解释 equations 中的 是 两两的数据 [3,1] [6,2]
+     * values 中是 equations 两两数据的 相处 的结果 vaLues = 3/1，6/2 = 3, 3
+     * queries 是全新数据的结果集 a b | a c | b c 等
+     * 我们就是要计算 queries 中各个结果集的 相处于的结果，和  推到 value一样
+     * <p>
+     * 解法：该题的关键点是如何建模
+     * ❌ 错误直觉
+     * 直接算？
+     * 用 Map 存 a/b？
+     * 多层关系怎么算？
+     * 👉 都不行
+     * <p>
+     * ✅ 正确建模：带权图
+     * 每个变量 = 图的一个节点
+     * 每个等式 = 一条带权边
+     * a / b = 2.0
+     * 表示：
+     * a --2.0--> b
+     * b --0.5--> a
+     * <p>
+     * 四、图长什么样（非常重要）
+     * 例子：
+     * a / b = 2
+     * b / c = 3
+     * 图：
+     * a --2--> b --3--> c
+     * a <--0.5-- b <--0.333-- c
+     * <p>
+     * 所以这题的核心就来了，我们需要一个图，来表示 a ---> b 中的 2 和 b ---> a 中的 0.5
+     * **** 这里使用 Map<Integer, Map<Integer, Double></>> 来记录
+     * 例子： Map<a, Map<b, 2></>></> 这样 map.get(a).get(b) 就等于我们的 2
+     * Map<b, Map<a, 0.5></>></> 这样 map.get(b).get(a) 就等于我们的 0.5
+     *
+     * BFS 思路（人话版）
+     *
+     * 从 start 出发
+     * 每走一条边，把当前结果 × 权重
+     * 走到 end，返回结果
+     * 走不到，返回 -1
+     *
+     * 举例： a/b = 2,  b/c = 3  --> a / c = ?  = (a / b) × (b / c)
+     *
+     * @param equations
+     * @param values
+     * @param queries
+     * @return
+     */
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        // 构建 指向图
+        Map<String, Map<String, Double>> graph = new HashMap<>();
+
+        int size = equations.size();
+        for (int i = 0; i < size; i++) {
+            String a = equations.get(i).get(0);
+            String b = equations.get(i).get(1);
+
+            double value = values[i];
+
+            // 开始创建图
+            graph.putIfAbsent(a, new HashMap<>());
+            graph.putIfAbsent(b, new HashMap<>());
+            graph.get(a).put(b, value);
+            graph.get(b).put(a, 1 / value);
+        }
+
+        // 通过我们创建的图，进行 queries 的遍历求值
+        int querySize = queries.size();
+
+        double[] result = new double[querySize];
+
+        for (int i = 0; i < querySize; i++) {
+            String a = queries.get(i).get(0);
+            String b = queries.get(i).get(1);
+
+            // 计算结果
+            result[i] = dfs(a, b, graph);
+        }
+
+        return result;
+    }
+
+    /**
+     * 使用 队列 去从 start 开邹
+     * @param start
+     * @param end
+     * @param graph
+     * @return
+     */
+    private Double dfs(String start, String end, Map<String, Map<String, Double>> graph) {
+        if (!graph.containsKey(start) || !graph.containsKey(end)) {
+            return -1.0;
+        }
+
+        // 当前访问的节点
+        Deque<String> deque = new ArrayDeque<>();
+        // 到当前节点的计算结果
+        Deque<Double> valueDeque = new ArrayDeque<>();
+        // 已经走过的路，防止走回头路
+        Set<String> visited = new HashSet<>();
+
+        deque.offer(start);
+        valueDeque.offer(1.0);
+        visited.add(start);
+
+        // 开始遍历
+        while (!deque.isEmpty()) {
+            String cur = deque.pop();
+            double curValue = valueDeque.pop();
+
+            // 如果 开始 和 结束 结果一样
+            if (cur.equals(end)) {
+                return curValue;
+            }
+
+            // 这里是一个关键点，一定要遍历完我们的图，不然会出现 算不出来的情况
+            for (String next : graph.get(cur).keySet()) {
+                if (!visited.contains(next)) {
+                    // 走过的 进行标识
+                    visited.add(next);
+                    deque.offer(next);
+                    // 这一步的意思就是 a / c = a / b * b / c
+                    valueDeque.offer(curValue * graph.get(cur).get(next));
+                }
+            }
+        }
+        return -1.0;
+    }
+
+
+    /**
+     * 207. 课程表
+     * 你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
+     * 在选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+     * 例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
+     * 请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
+     *
+     * 题目解析：举个例子，我有 a b c 三门课程，学 b 必须先学 a  学 c 必须先学 b ,这样 我按照 a b c 的顺序学就可以学完我的课程
+     * 但是 假如，我学 a 的前面必须学完 c ,那么就会变成 c -> a -> b -> c 形成了一个环，永远没发学了
+     *
+     * 所以，这题的核心，就是根据 prerequisites 构建我们的图，然后判断该 图 有没有环
+     *
+     * 如果 有环，那么不能学完，如果没有环，那么能学完
+     *
+     * @param numCourses
+     * @param prerequisites
+     * @return
+     */
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+
+        return false;
+    }
+
 
 }
