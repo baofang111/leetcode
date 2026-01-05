@@ -57,13 +57,48 @@ public class KadaneSolution {
      * 子数组 最多只能包含固定缓冲区 nums 中的每个元素一次。形式上，对于子数组 nums[i], nums[i + 1], ..., nums[j] ，不存在 i <= k1, k2 <= j 其中 k1 % n == k2 % n 。
      *
      * 解法思路：该题和 53 题最大的区别就是 一个是 环形 一个非环形，53 直接遍历 然后 计算 cur + max 就可以得到我们要的结果
-     * 该题
+     * 两种情况：
+     * 1 - 不跨越数组边界：
+     *  不跨越就是 53 题目的 最大子数组和 maxNormal = 最大连续子数组和（Kadane）
+     * 2 - 跨越数组边界：
+     *  跨越数组边界就是 [数组尾部的一段] + [数组头部的一段]，也就是说，你选了首尾，也就是说中间没有选，那么他就等于 maxCircular = 数组总和 - 最小连续子数组和
+     *
+     *  所以我们只需要算出三个点就能满足要求：
+     *      1：最大连续子数组和
+     *      2：nums 的 total
+     *      3: 最小连续子数组和
      *
      * @param nums
      * @return
      */
     public int maxSubarraySumCircular(int[] nums) {
+        int total = nums[0];
 
+        int maxCur = nums[0];
+        int maxSum = nums[0];
+
+        int minCur = nums[0];
+        int minSum = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+
+            // 计算最大连续
+            maxCur = Math.max(nums[i], maxCur + nums[i]);
+            maxSum = Math.max(maxSum, maxCur);
+
+            // 计算连续最小
+            minCur = Math.min(nums[i], minCur + nums[i]);
+            minSum = Math.min(minSum, minCur);
+
+            total += nums[i];
+        }
+
+        // 全负数的时候 会有问题
+        if (maxSum < 0) {
+            return maxSum;
+        }
+
+        return Math.max(maxSum, total - minSum);
     }
 
 }
