@@ -188,7 +188,7 @@ public class DuiSolution {
 
         // 创建最小推
         PriorityQueue<int[]> minHeap = new PriorityQueue<>(
-                (a, b) -> (nums1[a[0]] + nums2[a[1]]) - (nums1[b[0]] + nums2[b[1]])
+                Comparator.comparingInt(a -> (nums1[a[0]] + nums2[a[1]]))
         );
 
         // 初始化我们的最小推 根据 i,0 i+1,0 i+2,0 去初始化
