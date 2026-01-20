@@ -1,5 +1,8 @@
 package shuxue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 数学相关 算法题
  *
@@ -199,6 +202,101 @@ public class ShuXueSolution {
             N >>= 1;
         }
         return res;
+    }
+
+
+    /**
+     * 149. 直线上最多的点数
+     *
+     * 给你一个数组 points ，其中 points[i] = [xi, yi] 表示 X-Y 平面上的一个点。求最多有多少个点在同一条直线上。
+     *
+     * 输入：points = [[1,1],[2,2],[3,3]]
+     * 输出：3
+     *
+     * 解题思路：我们直接使用一个点作为锚点，然后计算每个点的斜率
+     * 例子：（ X1, Y1 ） ( X2, Y2 ) 斜率 = (X2-X1)/(Y2-Y1)
+     *
+     * 注意在计算的时候，注意 一些 为0 的边界情况即可
+     * 然后我们还需要考虑 ，比如 2/4 3/6 要给他取成最大公约数 转换成 1/2  1/2 ,这样我们才可以去判断他们是相等的
+     *
+     * 注意 这里不能使用 double 去计算，因为 double 计算的话，他会出现精度丢失的情况，这时候就不一样了
+     *
+     *
+     * @param points
+     * @return
+     */
+    public int maxPoints(int[][] points) {
+        int n = points.length;
+        if (n <= 2) {
+            return n;
+        }
+
+        int ans = 0;
+
+        // 我们从 第一个点开始固定，然后去计算后续点的 斜率
+        for (int i = 0; i < n; i++) {
+            // 我们使用 map 来计算每一个斜率他出现的次数 map.put( '1/2', 1 )
+            Map<String, Integer> map = new HashMap<>();
+
+            int x1 = points[i][0];
+            int y1 = points[i][1];
+
+            // 存储本次遍历的最大值
+            int curMax = 0;
+
+            // 然后我们从后面的点 进行遍历 计算斜率
+            for (int j = i + 1; j <n; j++) {
+
+                int x2 = points[j][0];
+                int y2 = points[j][1];
+
+                // 开始计算斜率
+                int dx = x2 - x1;
+                int dy = y2 - y1;
+
+                String key;
+
+                // 开始出了特殊情况
+                if (dx == 0) {
+                    // 垂直线
+                    key = "Y";
+                } else if (dy == 0) {
+                    // 水平线
+                    key = "X";
+                } else {
+                    // 这里可能出现负数的情况 1/-1 -1/1 要表示不同的位置
+                    if (dx < 0) {
+                        dx = -dx;
+                        dy = -dy;
+                    }
+
+                    // 计算他们的最大公约数
+                    int gcd = gcd(Math.abs(dx), Math.abs(dy));
+
+                    dx /= gcd;
+                    dy /= gcd;
+
+                    key = dx + "/" + dy;
+                }
+                // 添加次数
+                map.put(key, map.getOrDefault(key, 0) + 1);
+                curMax = Math.max(curMax, map.get(key));
+            }
+
+            // 换一个点  重新计算, 注意 +1 是需要算上自己
+            ans = Math.max(ans, curMax + 1);
+        }
+
+        return ans;
+    }
+
+    private int gcd(int a, int b) {
+        while (b != 0) {
+            int t = a % b;
+            a = b;
+            b = t;
+        }
+        return a;
     }
 
 }
