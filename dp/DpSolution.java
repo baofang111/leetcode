@@ -370,10 +370,10 @@ public class DpSolution {
 
     /**
      * 5. 最长回文子串
-     *
+     * <p>
      * 方法1：中心扩散法
      * 方法2：动态规划
-     *
+     * <p>
      * 我们先用中心扩散法
      *
      * @param s
@@ -387,25 +387,218 @@ public class DpSolution {
         int start = 0;
         int end = 0;
 
-        //
+        for (int i = 0; i < s.length(); i++) {
+            // 奇数
+            int len1 = getCenter(s, i, i);
 
+            // 偶数
+            int len2 = getCenter(s, i, i + 1);
 
-        return "";
+            // 开始计算
+            int len = Math.max(len1, len2);
+
+            if (len > end - start + 1) {
+                start = i - (len - 1) / 2;
+                end = i + len / 2;
+            }
+        }
+
+        return s.substring(start, end + 1);
     }
 
     /**
      * 获取 s 符合条件的 长度
+     *
      * @param s
      * @param left
      * @param right
      * @return
      */
     private int getCenter(String s, int left, int right) {
-        if (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
-            left++;
-            right--;
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
         }
         return right - left - 1;
+    }
+
+
+    public String longestPalindrome2(String s) {
+        if (s == null || s.length() == 1) {
+            return s;
+        }
+
+        int length = s.length();
+
+        // 我们分别用 奇数 or 偶数 来找到
+        int start = 0;
+        int maxLen = 0;
+
+        for (int i = 0; i < length; i++) {
+            // 奇数
+            int left = i;
+            int right = i;
+
+            while (left >= 0 && right < length && s.charAt(left) == s.charAt(right)) {
+                // 如果另外一个 长度超过了，就重新计算
+                if (right - left + 1 > maxLen) {
+                    maxLen = right - left + 1;
+                    start = left;
+                }
+
+                left--;
+                right++;
+            }
+
+            // 偶数
+            left = i;
+            right = i + 1;
+
+            while (left >= 0 && right < length && s.charAt(left) == s.charAt(right)) {
+                // 如果另外一个 长度超过了，就重新计算
+                if (right - left + 1 > maxLen) {
+                    maxLen = right - left + 1;
+                    start = left;
+                }
+
+                left--;
+                right++;
+            }
+        }
+
+        return s.substring(start, start + maxLen);
+    }
+
+
+    /**
+     * 97. 交错字符串
+     * <p>
+     * 给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+     * <p>
+     * 注意：因为是交错，所以 字符串的顺序是不能变的
+     * <p>
+     * 解题思路：
+     * S3 的每一个字符，一定来自 S1 或者 S2
+     * 所以我们必须记住，S1 用了多少，S2 用了多少，这天然就是一个二维的状态
+     * 所以我们的状态方程为：
+     * dp[i][j] = s1 的前 i 个字符 和 s2 的前 j 个字符，能否交错组成 s3 的 前 i + j 个字符
+     * 所以：
+     * dp[i][j] = dp[i-1][j] == true && s1[i-1] == s3[i + j - 1]
+     * or
+     * dp[i][j] = dp[i][j-1] == true && s2[j-1] == s3[i + j - 1]
+     * 然后 初始化
+     * dp[0][0] = true
+     * 第一行 只用 S2
+     * dp[0][j] = dp[0][j-1] && s2[j-1] == s3[j-1];
+     * 第一列 只用 S1
+     * dp[i][0] = dp[i-1][0] && s1[i-1] == s3[i-1];
+     */
+    public boolean isInterleave(String s1, String s2, String s3) {
+        if (s1.length() + s2.length() != s3.length()) {
+            return false;
+        }
+
+        // 思路，dp[i][j] = 前面组成之后，这个字符从S1 或者 S2 能匹配到
+        int m = s1.length();
+        int n = s2.length();
+
+        boolean[][] dp = new boolean[m + 1][n + 1];
+
+        // 初始化
+        dp[0][0] = true;
+
+        // 初始化 第一行，因为第一行 dp[0][j] 所以只能用 S2 进行初始化
+        for (int i = 1; i <= n; i++) {
+            dp[0][i] = dp[0][i - 1] && s2.charAt(i - 1) == s3.charAt(i - 1);
+        }
+
+        // 第一列
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = dp[i - 1][0] && s1.charAt(i - 1) == s3.charAt(i - 1);
+        }
+
+        // 开始遍历
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                dp[i][j] = (dp[i - 1][j] && s1.charAt(i - 1) == s3.charAt(i + j - 1))
+                        ||
+                        (dp[i][j - 1] && s2.charAt(j - 1) == s3.charAt(i + j - 1));
+            }
+        }
+
+        return dp[m][n];
+    }
+
+
+    /**
+     * 72. 编辑距离
+     * <p>
+     * 给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
+     * 你可以对一个单词进行如下三种操作：
+     * 插入一个字符
+     * 删除一个字符
+     * 替换一个字符
+     * <p>
+     * 解题思路：dp[i][j] = 把 word1 的前 i 个字符 变成 word2的 前 j个字符 所需的最小操作
+     * <p>
+     * 状态转移方程：
+     * word1[i] == word2[j]
+     * 两个相等，梭鱼不需要操作。dp[i][j] = dp[i-1][j-1]
+     * word1[i] != word2[j]
+     * 不一样的话，就需要三个操作，插入 + 删除 + 替换
+     * 插入，需要从 word1 往前一个继续匹配： dp[i][j] = dp[i - 1][j] + 1
+     * 删除：dp[i][j] = dp[i][j - 1] + 1
+     * 替换：替换，i j，都需要往前找，所以 dp[i][j] = dp[i - 1][j - 1] + 1
+     * <p>
+     * 所以状态转移方程 =
+     * dp[i][j] = min（ 插入，删除，替换 ）
+     *
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+
+        int[][] dp = new int[m + 1][n + 1];
+
+        // 初始化
+        for (int i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        for (int i = 0; i <= n; i++) {
+            dp[0][i] = i;
+        }
+
+        // 开始遍历
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    // 不需要变
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(
+                            // 插入 + 删除 + 替换
+                            Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1),
+                            dp[i - 1][j - 1] + 1
+                    );
+                }
+            }
+        }
+
+        return dp[m][n];
+    }
+
+    /**
+     * 123. 买卖股票的最佳时机 III
+     *
+     *
+     * @param prices
+     * @return
+     */
+    public int maxProfit(int[] prices) {
+
     }
 
 }
