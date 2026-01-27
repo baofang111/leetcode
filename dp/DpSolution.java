@@ -1,0 +1,411 @@
+package dp;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * 一维动态规划
+ *
+ * @summary DpSolution
+ * @author: bf
+ * @Copyright (c) 2026/1/20, © 拜耳作物科学（中国）有限公司
+ * @since: 2026/1/20 21:18
+ */
+public class DpSolution {
+
+    /**
+     * 70. 爬楼梯
+     * <p>
+     * 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+     * 每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+     * <p>
+     * 解题思路：典型的 DP 题目
+     * <p>
+     * 假如我在 第 N 个台阶，那么我只可能从 第 N-1 or N-2 个台阶上走过来，那么该题目答案就有了
+     *
+     * @param n
+     * @return
+     */
+    public int climbStairs(int n) {
+        if (n <= 2) {
+            return n;
+        }
+
+        // 因为我的状态转移方程是 n-1 n-2 所以我们要初始化两个起始点位
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        dp[1] = 1;
+
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+
+
+    /**
+     * 198. 打家劫舍
+     * <p>
+     * 你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，
+     * 如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
+     * <p>
+     * 解题思路：这也是一道典型的 动态规划题目，状态转移方程
+     * 前一个房子 偷 或者不偷
+     * 当前房子 偷的话，dp[i] = dp[i - 2] + num[i]
+     * 不偷当前的房子 dp[i] = dp[i - 1]
+     * 所以完整的状态转移方程就是 dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i])
+     * <p>
+     * 边界情况 0 只能偷
+     * 1 可偷 可不偷
+     *
+     * @param nums
+     * @return
+     */
+    public int rob(int[] nums) {
+        int n = nums.length;
+        if (n < 1) {
+            return nums[0];
+        }
+
+        // 我们初始化 前面数据
+        int[] dp = new int[n];
+        dp[0] = nums[0];
+        // 1 位置 取最大的
+        dp[1] = Math.max(nums[0], nums[1]);
+
+        for (int i = 2; i < n; i++) {
+            dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+
+        return dp[n - 1];
+    }
+
+    /**
+     * 139. 单词拆分
+     * <p>
+     * 给你一个字符串 s 和一个字符串列表 wordDict 作为字典。如果可以利用字典中出现的一个或多个单词拼接出 s 则返回 true。
+     * <p>
+     * 就是看 单词字典 wordDict 能不能拼接成 单词 s
+     * <p>
+     * 解法思路：使用  DP ，我们将 s 做切割，i j, 看 i j 之间的单词 有没有在 字典中存在，如果存在，就更新 dp 为 true
+     * 然后我们直到遍历完，看 dp[j] 是 true 还是 false
+     *
+     * @param s
+     * @param wordDict
+     * @return
+     */
+    public boolean wordBreak(String s, List<String> wordDict) {
+        if (s == null) {
+            return false;
+        }
+
+        int length = s.length();
+
+        // 先 字典去重
+        Set<String> dict = new HashSet<>(wordDict);
+
+        // 创建 dp
+        boolean[] dp = new boolean[length + 1];
+
+        dp[0] = true;
+
+        // 初始化刚开始的时候,注意 一定要 从 0 开始
+        for (int i = 1; i <= length; i++) {
+            for (int j = 0; j < i; j++) {
+                // 从 j - i 之间判断
+                if (dp[j] && dict.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[length];
+    }
+
+    /**
+     * 322. 零钱兑换
+     * <p>
+     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+     * 计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。
+     * <p>
+     * 解题思路：这题和单词拆分是一个意思 coins 随意组合，最少能组合成 amount 的个数
+     * <p>
+     * 状态转移方程：
+     * dp[i] = 凑出 金额 i 所需要的最少硬币数
+     * <p>
+     * 所以 dp[i] = min(dp[i], dp[i-coin] + 1)
+     *
+     * @param coins
+     * @param amount
+     * @return
+     */
+    public int coinChange(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, amount + 1);
+
+        // 初始化
+        dp[0] = 0;
+
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (i - coin >= 0) {
+                    // 可以用钱来凑了
+                    // 这里的 dp[i - coin] 很关键，就相当于 我 1 2 5 ，我到 6 的时候， 看有没有 dp[5] + 1
+                    dp[i] = Math.max(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+
+
+    /**
+     * 300. 最长递增子序列
+     * <p>
+     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+     * <p>
+     * 输入：nums = [10,9,2,5,3,7,101,18]
+     * 输出：4
+     * 解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
+     * <p>
+     * 解题思路：这题和 322 题目又是有点类似
+     * <p>
+     * 状态转移方程
+     * dp[i] = 以 nums[i] 结尾的最长递增子序列
+     * <p>
+     * 如果是 i > j 的情况
+     * dp[i] = max(dp[i], d[j] + 1)
+     *
+     * @param nums
+     * @return
+     */
+    public int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int length = nums.length;
+        int[] dp = new int[length];
+
+        int ans = 1;
+
+        for (int i = 0; i < length; i++) {
+            // 这个初始化 一定要是 1, 且一定要在里面初始化，每次都要 重新初始化 以便计算
+            dp[i] = 1;
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    // 有递增，开始更新我们的 dp
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            ans = Math.max(ans, dp[i]);
+        }
+
+        return ans;
+    }
+
+
+    /**
+     * 120. 三角形最小路径和
+     * <p>
+     * 给定一个三角形 triangle ，找出自顶向下的最小路径和。
+     * <p>
+     * 每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。
+     * 也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
+     * <p>
+     * 解法思路：dp[i] 当前位置 + 下面一层 dp[i] + dp[i+1] 的最小值
+     * <p>
+     * 每一层的选择 只依赖上一层
+     * 每个位置 (i, j) 的最优值 = 上一层某些位置的最优值 + 自己
+     * <p>
+     * 我们定义 dp[i][j] = 从顶部走到 i行 j列 位置的最小路径和
+     * <p>
+     * 注意两个临界条件 从最左边 or 最右边 开始走
+     * 最左边： dp[i][0] = dp[i-1][0] + triangle[i][0]
+     * 最右边:  dp[i][i] = dp[i-1][i-1] + triangle[i-1][i-1]
+     * 中间：   dp[i][j] = min(dp[i-1][j-1], dp[i-1][j], triangle[i][j])
+     * <p>
+     * 我们使用 二维 DP 数组求解,然后走到最后一行就结束
+     *
+     * @param triangle
+     * @return
+     */
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[][] dp = new int[n][n];
+
+        // 先初始化, 三角形 顶点点位
+        dp[0][0] = triangle.get(0).get(0);
+
+        // 开始遍历 从 第二行开始
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                Integer val = triangle.get(i).get(j);
+                if (j == 0) {
+                    // 最左边
+                    dp[i][0] = dp[i - 1][0] + val;
+                } else if (j == i) {
+                    // 最右边
+                    dp[i][j] = dp[i - 1][j - 1] + val;
+                } else {
+                    // 中间位置
+                    dp[i][j] = Math.min(dp[i - 1][j - 1], dp[i - 1][j]) + val;
+                }
+            }
+        }
+
+        // 我们取最后一行的最小值就行
+        int ans = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            ans = Math.min(ans, dp[n - 1][i]);
+        }
+
+        return ans;
+    }
+
+    /**
+     * 64. 最小路径和
+     * <p>
+     * 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+     * 说明：每次只能向下或者向右移动一步。
+     * <p>
+     * 解题思路：和 120 题目一样，这题不一样的点是 每次只能向下 或者 想右移动一步
+     * <p>
+     * dp 表示
+     * dp[i][j] = 从 0，0 位置 走到 i,j 位置的最小路径和
+     * 然后因为智能 向下 or 向右移动，所以状态转移方程就出来了
+     * dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+     * <p>
+     * 然后我们注意 第一行 + 第一列的零界点就行
+     * 第一行：只从左边来 dp[0][j] = dp[0][j-1] + val
+     * 第一列：只能从上边来  dp[i][0] = dp[i-1][0] + val
+     *
+     * @param grid
+     * @return
+     */
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+
+        // 初始化
+        dp[0][0] = grid[0][0];
+
+        // 然后分别初始化 第一行 + 第一列
+        for (int j = 1; j < n; j++) {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+
+        // 开始遍历,一定要从1开始
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+
+        return dp[m - 1][n - 1];
+    }
+
+    /**
+     * 63. 不同路径 II
+     * <p>
+     * 给定一个 m x n 的整数数组 grid。一个机器人初始位于 左上角（即 grid[0][0]）。机器人尝试移动到 右下角（即 grid[m - 1][n - 1]）。机器人每次只能向下或者向右移动一步。
+     * 网格中的障碍物和空位置分别用 1 和 0 来表示。机器人的移动路径中不能包含 任何 有障碍物的方格。
+     * 返回机器人能够到达右下角的不同路径数量。
+     * <p>
+     * 解法思路：
+     * dp[i][j] = 从 0，0 走到 i j 的不同的路劲数
+     * 然后需要注意的点激素 如果 obstacleGrid[i][j] = 1 的话，那么代表这个是障碍物 dp[i][j] = 0
+     * 然后和 64 题目基本一样，我们同样初始化 第一行 + 第一列，遇到石头 设置 0
+     *
+     * @param obstacleGrid
+     * @return
+     */
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+
+        int[][] dp = new int[m][n];
+
+        // 开头就遇到石头了
+        if (obstacleGrid[0][0] == 1) {
+            return 0;
+        }
+
+        dp[0][0] = 1;
+
+        // 第一行
+        for (int i = 1; i < n; i++) {
+            dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : dp[0][i - 1];
+        }
+
+        // 第一列
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = obstacleGrid[i][0] == 1 ? 0 : dp[i - 1][0];
+        }
+
+        // 开始遍历
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                } else {
+                    // 左边和上边来的 路径可能性 相加
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+
+        return dp[m - 1][n - 1];
+    }
+
+
+    /**
+     * 5. 最长回文子串
+     *
+     * 方法1：中心扩散法
+     * 方法2：动态规划
+     *
+     * 我们先用中心扩散法
+     *
+     * @param s
+     * @return
+     */
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() == 1) {
+            return s;
+        }
+
+        int start = 0;
+        int end = 0;
+
+        //
+
+
+        return "";
+    }
+
+    /**
+     * 获取 s 符合条件的 长度
+     * @param s
+     * @param left
+     * @param right
+     * @return
+     */
+    private int getCenter(String s, int left, int right) {
+        if (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left++;
+            right--;
+        }
+        return right - left - 1;
+    }
+
+}
