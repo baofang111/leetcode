@@ -592,13 +592,186 @@ public class DpSolution {
 
     /**
      * 123. 买卖股票的最佳时机 III
-     *
+     * <p>
+     * 给定一个数组，它的第 i 个元素是一支给定的股票在第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 两笔 交易。
+     * <p>
+     * 解题思路：动态规划 + 状态机
+     * 每天只需要关系，现在是第几次交易，手里还有没有股票
+     * <p>
+     * 我们用 dp[i][k][0/1]
+     * i: 第 i 天
+     * k: 是否还能完成第 K 次交易，k = 0/1/2
+     * 0/1: 是否持有股票
+     * 0：不持有
+     * 1： 持有
+     * <p>
+     * 状态定义：
+     * dp[i][k][0] = 第 i 天结束后，最多 k 次交易，不持股的最大利润
+     * dp[i][k][1] = 第 i 天结束后，最多 k 次交易，持股的最大利润
+     * <p>
+     * 所以 状态转移方程：就是 今天要不买，要不不买
+     * 持股： 今天买入 + 什么也不做 （因为今天买入了一次，所以金额 是 - price ,且做了一次买入动作，k 需要 - 1 ）
+     * dp[i][k][1] = max( dp[i-1][k][1], dp[i-1][k-1][0] - prices[i] )
+     * <p>
+     * 不持股： 今天卖出 + 什么也不多
+     * dp[i][k][0] = max( dp[i-1][k][0], dp[i-1][k][0] + prices[i] )
+     * <p>
+     * 初始化：
+     * 第一天 不买
+     * dp[0][k][0] = 0
+     * 第一天买入，买入需要计算成本
+     * dp[0][k][1] = - prices[0]
+     * <p>
+     * 为什么结束是:  dp[n-1][2][0]
+     * 因为结束 不能持股 + 最多两次交易
      *
      * @param prices
      * @return
      */
     public int maxProfit(int[] prices) {
+        int n = prices.length;
+        if (n == 0) {
+            return 0;
+        }
 
+        // 创建状态转移方程
+        int[][][] dp = new int[n][3][2];
+
+        // 初始化
+        for (int k = 0; k <= 2; k++) {
+            dp[0][k][0] = 0;
+            dp[0][k][1] = -prices[0];
+        }
+
+        // 状态转移
+        for (int i = 1; i < n; i++) {
+            for (int k = 1; k <= 2; k++) {
+                // 不持有 = 啥也不干 + 今天卖出
+                dp[i][k][0] = Math.max(dp[i - 1][k][0], dp[i - 1][k][1] + prices[i]);
+                // 持有 = 啥也不干 + 今天买入
+                dp[i][k][1] = Math.max(dp[i - 1][k][1], dp[i - 1][k - 1][0] - prices[i]);
+            }
+        }
+
+        return dp[n - 1][2][0];
+    }
+
+    /**
+     * 188. 买卖股票的最佳时机 IV
+     * <p>
+     * 给你一个整数数组 prices 和一个整数 k ，其中 prices[i] 是某支给定的股票在第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 k 笔交易。也就是说，你最多可以买 k 次，卖 k 次。
+     * <p>
+     * 解题思路：该题的解题思路和 123 最多2次的思路 一模一样，只不过 2 次换成了 K 次
+     * 且 还有个小优化的点，就是 k > n/2 代表可以无限次买卖股票，直接 遇到下一天 > 上一天 的价格，然后利润高累加 即可
+     *
+     * @param k
+     * @param prices
+     * @return
+     */
+    public int maxProfit(int k, int[] prices) {
+        int n = prices.length;
+        if (n == 0) {
+            return 0;
+        }
+
+        // 可以 prices 内，无限次买卖股票
+        if (k > n / 2) {
+            int total = 0;
+            for (int i = 1; i < n; i++) {
+                if (prices[i] > prices[i - 1]) {
+                    total += prices[i] - prices[i - 1];
+                }
+            }
+            return total;
+        }
+
+        // 走到这里，代表不能无限次买卖股票，那么我们就使用 dp 去进行状态转移
+        // dp[i][k][flag] i: 第几天 k: 最多多少次交易 flag: 持有股票的状态 0-不持有 1-持有
+        int[][][] dp = new int[n][k + 1][2];
+
+        // 初始化,初始化 第0天，持有 or 不持有股票的 初始化值,注意，初始化，第几次 K 是否持有股票 全部进行初始化
+        for (int i = 0; i <= k; i++) {
+            // 不持有股票的 成本是 0
+            dp[0][i][0] = 0;
+            // 持有股票的 成本是 当前天的 股票价格
+            dp[0][i][1] = -prices[0];
+        }
+
+        // 状态转移
+        for (int i = 1; i < n; i++) {
+            // 第1次交易开始
+            for (int j = 1; j <= k; j++) {
+                // 持有股票 = 前一天持有 却什么不操作 or 今天持有买入(今天买入的话，前一天一定要不持有，且做了一次交易操作，j 一定是需要 -1 )
+                dp[i][j][1] = Math.max(dp[i - 1][j][1], dp[i - 1][j - 1][0] - prices[i]);
+
+                // 不持有股票 = 前一天不持有 or 昨天持有 + 今天卖出
+                dp[i][j][0] = Math.max(dp[i - 1][j][0], dp[i - 1][j][1] + prices[i]);
+            }
+        }
+
+        // 最后一天 一定是 不持有股票的
+        return dp[n - 1][k][0];
+    }
+
+    /**
+     * 221. 最大正方形
+     * <p>
+     * 在一个由 '0' 和 '1' 组成的二维矩阵内，找到只包含 '1' 的最大正方形，并返回其面积。
+     * <p>
+     * 解题思路：固定 1 之后，往 下 or  右 进行 1 的寻找
+     * <p>
+     * dp: 以 i，j 作为右下角的最大正方形的边长是多少
+     * <p>
+     * dp[i][j] = 以 i, j 为右下角的 最大正方形的 边长是多少
+     * <p>
+     * 为阿妈选择 右下角，因为 右下角同时受 左 上 左上 约束
+     * <p>
+     * 所以状态转移方程为：
+     * 初始化：
+     * dp[0][0] = 0
+     * 右下角：
+     * dp[i][j] = min(
+     * dp[i-1][j]  上
+     * dp[i][j-1]  左
+     * dp[i-1][j-1]  左上
+     * ) + 1
+     * 因为是正方形，所以要取最小值
+     *
+     * @param matrix
+     * @return
+     */
+    public int maximalSquare(char[][] matrix) {
+        // 使用 二维 dp 进行 操作
+        int m = matrix.length;
+        int n = matrix[0].length;
+
+        int[][] dp = new int[m][n];
+        int maxLength = 0;
+
+        // 开始遍历
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                // 只有 = 1 的时候再进行寻找
+                if (matrix[i][j] == '1') {
+                    if (i == 0 || j == 0) {
+                        // 边界情况，直接 + 1
+                        dp[i][j] = 1;
+                    } else {
+                        // 使用状态转移方程，寻找
+                        dp[i][j] = Math.min(
+                                Math.min(dp[i - 1][j], dp[i][j - 1]),
+                                dp[i - 1][j - 1]
+                        ) + 1;
+                    }
+                }
+
+                maxLength = Math.max(maxLength, dp[i][j]);
+            }
+        }
+
+        return maxLength * maxLength;
     }
 
 }
