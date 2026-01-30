@@ -15,12 +15,11 @@ public class HashSolution {
 
     /**
      * 383. 赎金信
-     *给你两个字符串：ransomNote 和 magazine ，判断 ransomNote 能不能由 magazine 里面的字符构成。
+     * 给你两个字符串：ransomNote 和 magazine ，判断 ransomNote 能不能由 magazine 里面的字符构成。
      * 如果可以，返回 true ；否则返回 false 。
      * magazine 中的每个字符只能在 ransomNote 中使用一次。
-     *
+     * <p>
      * 解法：直接暴力遍历 即可，将 ransomNote
-     *
      *
      * @param ransomNote
      * @param magazine
@@ -50,11 +49,11 @@ public class HashSolution {
      * 定两个字符串 s 和 t ，判断它们是否是同构的。
      * 如果 s 中的字符可以按某种映射关系替换得到 t ，那么这两个字符串是同构的。
      * 每个出现的字符都应当映射到另一个字符，同时不改变字符的顺序。不同字符不能映射到同一个字符上，相同字符只能映射到同一个字符上，字符可以映射到自己本身。
-     *
+     * <p>
      * s→t 映射：保证同一个 s 字符映射到同一个 t 字符
      * t→s 映射：保证同一个 t 字符只能对应一个 s 字符
      * 双向检查，才能保证 “一对一” 映射关系。
-     *
+     * <p>
      * 适用双 hashMap 即可
      *
      * @param s
@@ -101,7 +100,7 @@ public class HashSolution {
      * pattern 中的每个字母都 恰好 映射到 s 中的一个唯一单词。
      * s 中的每个唯一单词都 恰好 映射到 pattern 中的一个字母。
      * 没有两个字母映射到同一个单词，也没有两个单词映射到同一个字母。
-     *
+     * <p>
      * 解法：这题和 205 差不多，一个是字符直接的互相匹配，一个是 字符和 单词直接的互相匹配
      *
      * @param pattern
@@ -145,9 +144,9 @@ public class HashSolution {
 
     /**
      * 242. 有效的字母异位词
-     *
-     *  解法： 同样和 205 差不多，我们适用 一个数组，存储 每个单词的 出现次数
-     *  ，如果 st 两个出现的次数不一样，那么就不是，出现的次数一样，就是
+     * <p>
+     * 解法： 同样和 205 差不多，我们适用 一个数组，存储 每个单词的 出现次数
+     * ，如果 st 两个出现的次数不一样，那么就不是，出现的次数一样，就是
      *
      * @param s
      * @param t
@@ -183,7 +182,7 @@ public class HashSolution {
 
     /**
      * 49. 字母异位词分组
-     *
+     * <p>
      * 解法： 暴力解法，判断是否是 异位词
      * 我们适用 map 然后将 排序之后的 作为 key ,未排序的作为 value
      *
@@ -201,7 +200,7 @@ public class HashSolution {
 
             String sortStr = new String(charArray);
 
-            map.computeIfAbsent(sortStr,k -> new ArrayList<>()).add(str);
+            map.computeIfAbsent(sortStr, k -> new ArrayList<>()).add(str);
 //            if (map.containsKey(sortStr)) {
 //                map.get(sortStr).add(str);
 //            } else {
@@ -217,7 +216,7 @@ public class HashSolution {
     /**
      * 1. 两数之和
      * 解法：map 双指针 都可以，这里我们适用 map
-     *
+     * <p>
      * 注意，这里的 nums 不一定是有序的
      *
      * @param nums
@@ -240,7 +239,7 @@ public class HashSolution {
 
     /**
      * 202. 快乐数
-     *
+     * <p>
      * 解法： 适用 一个 hash 来判断 是否循环即可
      *
      * @param n
@@ -273,7 +272,7 @@ public class HashSolution {
      * 219. 存在重复元素 II
      * 给你一个整数数组 nums 和一个整数 k ，判断数组中是否存在两个 不同的索引 i 和 j ，
      * 满足 nums[i] == nums[j] 且 abs(i - j) <= k 。如果存在，返回 true ；否则，返回 false
-     *
+     * <p>
      * 解法：使用一个 map 记录一下 上一个该值 所在的 index 位置即可
      *
      * @param nums
@@ -302,7 +301,7 @@ public class HashSolution {
      * 输入：nums = [100,4,200,1,3,2]
      * 输出：4
      * 解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
-     *
+     * <p>
      * 解答：适用 hashMap ，记录我们的 nums 所有数据，
      * 然后遍历，判断有没有 + 1 有值的数据，有 我们的 count + 1
      * 然后找到我们的最大 max
