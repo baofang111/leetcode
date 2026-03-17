@@ -81,6 +81,11 @@ public class SlidingWindowSolutionV2 {
                 left = indexMap.get(c) + 1;
             }
 
+            // 下面这种方式也行
+//            if (indexMap.containsKey(c)) {
+//                left = Math.max(left, indexMap.get(c) + 1);
+//            }
+
             indexMap.put(c, right);
             max = Math.max(max, right - left + 1);
         }
