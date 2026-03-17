@@ -154,7 +154,7 @@ public class DpSolution {
                 if (i - coin >= 0) {
                     // 可以用钱来凑了
                     // 这里的 dp[i - coin] 很关键，就相当于 我 1 2 5 ，我到 6 的时候， 看有没有 dp[5] + 1
-                    dp[i] = Math.max(dp[i], dp[i - coin] + 1);
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
                 }
             }
         }
@@ -397,6 +397,7 @@ public class DpSolution {
             // 开始计算
             int len = Math.max(len1, len2);
 
+            // 比当前的记录更长，那么久更新答案
             if (len > end - start + 1) {
                 start = i - (len - 1) / 2;
                 end = i + len / 2;
@@ -597,7 +598,7 @@ public class DpSolution {
      * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 两笔 交易。
      * <p>
      * 解题思路：动态规划 + 状态机
-     * 每天只需要关系，现在是第几次交易，手里还有没有股票
+     * 每天只需要关心，现在是第几次交易，手里还有没有股票
      * <p>
      * 我们用 dp[i][k][0/1]
      * i: 第 i 天
