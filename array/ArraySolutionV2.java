@@ -1,11 +1,12 @@
 package array;
 
-import com.sun.tools.javac.Main;
 
 import java.util.*;
 
 /**
  * 刷题 第二版
+ *
+ * 数组
  *
  * @summary ArraySolutionV2
  * @author: bf
