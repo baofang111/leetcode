@@ -579,9 +579,8 @@ public class ArraySolutionV3 {
 
     /**
      * 28. 找出字符串中第一个匹配项的下标
-     *
+     * <p>
      * 题目意思：遍历即可
-     *
      */
     public int strStr(String haystack, String needle) {
         if (haystack == null || needle == null) {
@@ -599,5 +598,106 @@ public class ArraySolutionV3 {
 
         return -1;
     }
+
+    /**
+     * 135. 分发糖果
+     * <p>
+     * 题目意思：就是 每个孩子至少分配一个糖果，然后相邻的 的两个孩子，评分更高的就会得到更多的糖果
+     * <p>
+     * 题目解析：我们只需要 初始化两个糖果集合，然后分别计算 只考虑左边，或者只考虑右边的情况，那么我们就得到了 两个分别满足左右两边的堂哥集合
+     * 但是我们如何保证同时满足两边呢，我们只需要在左右两边取最大即可 这样就能同时满足两边的情况
+     * 举个例子，因为左边更小的都已经满足了，我取最大，只会更加的满足，反而右边本来已经就是这个数值了，本身就是满足要求
+     *
+     * @param ratings
+     * @return
+     */
+    public int candy(int[] ratings) {
+        int length = ratings.length;
+        if (length == 0) {
+            return 0;
+        }
+
+        int[] left = new int[length];
+        int[] right = new int[length];
+        int ans = 0;
+
+        Arrays.fill(left, 1);
+        Arrays.fill(right, 1);
+
+        // 先填充左边
+        for (int i = 1; i < length; i++) {
+            if (ratings[i] > ratings[i - 1]) {
+                left[i] = left[i - 1] + 1;
+            }
+        }
+
+        // 再填充右边
+        for (int i = length - 1; i >= 1; i--) {
+            if (ratings[i - 1] > ratings[i]) {
+                right[i - 1] = right[i] + 1;
+            }
+        }
+
+        // 比对左右两边寻找最大值
+        for (int i = 0; i < length; i++) {
+            ans += Math.max(left[i], right[i]);
+        }
+
+        return ans;
+    }
+
+    /**
+     * 42. 接雨水
+     *
+     * 题目意思：举个例子 假如 我 1 0 2 那么我就可以接到 min(1,2) * 1 的水，然后让我们把 height 里面的水 全部计算出来，然后累加即可
+     *
+     * 题目解释：核心代码其实，就是 我们需要判断最小边，然后 min(height[left], height[right])
+     *
+     * 所以我们要计算每个位置能装多少水，就很明显了，water[i] = min(leftMax[i], rightMax[i]) - height[i]
+     *
+     *
+     */
+    public int trap(int[] height) {
+        int length = height.length;
+        if (length == 0) {
+            return 0;
+        }
+
+        // 总水位
+        int water = 0;
+
+        // 左右最大值
+        int leftMax = 0;
+        int rightMax = 0;
+
+        // 设置左右指针
+        int left = 0;
+        int right = length - 1;
+
+        // 我们根据我们的公式 就能得到我们能装的最大水位了
+        while (left < right) {
+            if (height[left] < height[right]) {
+                // 这边是左边更小，那么就需要以左边作为标点。然后再次判断 leftMax 和 height[left] 的大小
+                if (height[left] > leftMax) {
+                    // 比他大，就需要更新 leftMax，为什么这里不存水，因为当前柱子比之前的更高，根本存不了水
+                    leftMax = height[left];
+                } else {
+                    //  比他小，那么我们就需要更新当前位置水位了
+                    water += leftMax - height[left];
+                }
+                left++;
+            } else {
+                if (height[right] > rightMax) {
+                    rightMax = height[right];
+                } else {
+                    water += rightMax - height[right];
+                }
+                right--;
+            }
+        }
+
+        return water;
+    }
+
 
 }
