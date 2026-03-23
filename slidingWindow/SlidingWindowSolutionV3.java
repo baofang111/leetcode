@@ -84,6 +84,8 @@ public class SlidingWindowSolutionV3 {
     /**
      * 30. 串联所有单词的子串
      *
+     * TODO 太复杂了
+     *
      */
     public List<Integer> findSubstring(String s, String[] words) {
 
