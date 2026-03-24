@@ -229,12 +229,86 @@ public class JuzhenSolutionV2 {
 
     /**
      * 289. 生命游戏
-     *
+     * <p>
+     * 题目意思：简单的来说，就是 1 是活细胞，0是死细胞，但是 如果我 一个活细胞周围细胞太多了，那么他就会变成 死细胞，
+     * 如果 死细胞
+     * 活细胞周围活细胞数 定位为 total
+     * 1：total < 2 | total > 3 , 当前细胞死亡 1 - >0
+     * 2：total = 2 | 3, 当前细胞存活 1 -> 1
+     * 3:total = 3, 如果当前是 死细胞 0 -> 1
+     * <p>
+     * 所以 我们就需要 挨个遍历 行 列 -1 - 1， 然后统计 每一个周围的 活细胞数
+     * <p>
+     * 如果是 1 -> 0 | 0 -> 1  的情况，需要在原地做一个记录 四个状态
+     * 活
+     * 死
+     * 活 - 死
+     * 死 - 活
      *
      * @param board
      */
     public void gameOfLife(int[][] board) {
+        /*
+             使用四个数值，来表示，四种状态
+             0：死
+             1：活
+             2：活 - 死
+             3：死 - 活
+         */
 
+        int n = board.length;
+        int m = board[0].length;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                // 开始遍历
+                int total = 0;
+
+                // 我们需要遍历周围的八个数据
+                for (int k = -1; k <= 1; k++) {
+                    for (int l = -1; l <= 1; l++) {
+                        if (k == 0 && l == 0) {
+                            // 是自己这个点，直接放行
+                            continue;
+                        }
+
+                        int i1 = k + i;
+                        int j1 = j + l;
+
+                        if (i1 >= 0 && j1 >= 0 && i1 < n && j1 < m) {
+                            // 注意这里 1 是活细胞，如果是 2 ，他也是活细胞，因为当前是活细胞，是后面才变成死细胞
+                            if (board[i1][j1] == 1 || board[i1][j1] == 2) {
+                                total++;
+                            }
+                        }
+                    }
+                }
+
+                // 记录 2 3 的状态
+                if (board[i][j] == 1) {
+                    // 活细胞 变 死细胞
+                    if (total > 3 || total < 2) {
+                        board[i][j] = 2;
+                    }
+                } else {
+                    // 死细胞 变活细胞
+                    if (total == 3) {
+                        board[i][j] = 3;
+                    }
+                }
+            }
+        }
+
+        // 重新遍历，如果是 2 3 将它们变成相应的活细胞或者死细胞
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (board[i][j] == 2) {
+                    board[i][j] = 0;
+                } else if (board[i][j] == 3) {
+                    board[i][j] = 1;
+                }
+            }
+        }
     }
 
 }
