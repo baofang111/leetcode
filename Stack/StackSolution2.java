@@ -13,6 +13,32 @@ import java.util.*;
  * peek 查看栈顶 元素 但不删除
  * pop 出栈 查看栈顶元素，并删除元素 和 peek 的不通
  *
+ * -------------------
+ *
+ * ArrayDeque 它同时具备队列（FIFO）、双端队列、栈（LIFO） 三种数据结构的功能，官方推荐优先用它替代 Stack 和 LinkedList。
+ *
+ * // 头部添加
+ * deque.addFirst("A");    // 满了抛异常
+ * deque.offerFirst("B");  // 满了返回 false（推荐）
+ *
+ * // 尾部添加
+ * deque.addLast("C");
+ * deque.offerLast("D");
+ *
+ * // 头部删除
+ * deque.removeFirst();    // 空了抛异常
+ * deque.pollFirst();      // 空了返回 null（推荐）
+ *
+ * // 尾部删除
+ * deque.removeLast();
+ * deque.pollLast();
+ *
+ * // 查看元素（不删除）
+ * deque.getFirst();       // 空抛异常
+ * deque.peekFirst();      // 空返回 null（推荐）
+ * deque.getLast();
+ * deque.peekLast();
+ *
  * @summary StackSolution2
  * @author: bf
  * @Copyright (c) © 拜耳作物科学（中国）有限公司
@@ -198,53 +224,62 @@ public class StackSolution2 {
      * @return
      */
     public int calculate(String s) {
+        /*
+            该题的核心 需要④个主要元素
+            result: 记录每次计算的结果值 比如 3+4+5 我们需要记录每次 计算的值，3+4 = 7 用于后续计算
+            sign: 当前的 计算符号是什么
+            num: 目前遍历 解析到的 数字，注意需要注意 12 这种情况，所以 num = num * 10 + c - '0'
+            stack: 我们计算的时候，会有这种情况 1+（3+4-5）我们先需要计算括号里面的数据，所以就需要将之前的 1（result） +(sign) 进行
+                入栈存储
+         */
+
         s = s.replace(" ", "");
 
-        // 该题目的核心 就是 我们不断的遍历 针对 + - （ ） 做分别的处理，且一定要有三个数据去记录我们计算的中途结果，num result sign
-
-        // 解析到的 数字
-        int num = 0;
-        // 当前计算到的结果 统计
-        int result = 0;
-        // 当前的计算编号 + 1 - -1
-        int sign = 1;
         Deque<Integer> stack = new ArrayDeque<>();
+        int num = 0;
+        int result = 0;
+        int sign = 1;
 
-        char[] charArray = s.toCharArray();
-        for (Character c : charArray) {
+        int length = s.length();
+        for (int i = 0; i < length; i++) {
+            char c = s.charAt(i);
             if (Character.isDigit(c)) {
-                // 处理数字
-                num = num * 10 + (c - '0');
-            } else if (c == '+') {
-                //  + 号的话，我们需要记录 该 + 号状态，并且重置 sign 和 num 的数据
-                result += sign * num;
-                num = 0;
-                sign = 1;
-            }else if (c == '-') {
-                // 和 - 相反
-                result += sign * num;
-                num = 0;
-                sign = -1;
-            }else if (c == '(') {
-                // 这里我们需要 把上面记录的数据 进行存储到栈里面，方便后面的计算
-                // 举个例子 1 + （3 + 4） 我们要把 1 + 记录下来，然后 在 ) 处理好 3+4 的时候再和他进行计算
-                stack.push(result);
-                stack.push(sign);
+                num = num * 10 + c - '0';
+            } else {
+                // 判断 + - （ ） 的各种情况
+                if (c == '+') {
+                    // + 需要处理的情况 3+4+5 我们需要 result + 当前的 num,比如 第二个 + 号，这时候就是 result += num
+                    result += num * sign;
 
-                // 需要重置环境
-                result = 0;
-                sign = 1;
+                    // 注意 重置相关状态
+                    sign = 1;
+                    num = 0;
+                } else if (c == '-') {
+                    result += num * sign;
 
-                // 注意 这里面是不需要计算的，只需要将 之前的计算结果 进行 入栈
-            }else if (c == ')') {
-                // 我们 需要对 （ ） 中间的数据 进行汇总,也就是 不断累加 （ ）中的 result ，然后对 1 + 进行重新累加计算
-                result += sign * num;
-                num = 0;
+                    // 注意 重置相关状态
+                    sign = -1;
+                    num = 0;
+                } else if (c == '(') {
+                    // （ 的情况是类似于这样的情况 1+( 走到 ( 的时候我们需要将 1（result） +(sign) 进行存储
+                    stack.push(result);
+                    stack.push(sign);
 
-                Integer preSign = stack.pop();
-                Integer preResult = stack.pop();
+                    // 重置
+                    result = 0;
+                    sign = 1;
+                } else {
+                    // ) 需要计算 栈里面的 preResult + 当前的 result 的累加值了
+                    result += num * sign;
 
-                result = result + preResult * preSign;
+                    Integer preSign = stack.pop();
+                    Integer preResult = stack.pop();
+
+                    result = preResult + result * preSign;
+
+                    // 计算完需要重置 num
+                    num = 0;
+                }
             }
         }
 
