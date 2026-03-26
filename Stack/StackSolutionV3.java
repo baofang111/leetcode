@@ -44,7 +44,6 @@ public class StackSolutionV3 {
             if (pre.contains(c)) {
                 // 前半部分 入栈
                 stack.push(c);
-                continue;
             } else {
                 Character value = stack.pop();
 
