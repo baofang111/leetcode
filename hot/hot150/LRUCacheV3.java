@@ -1,4 +1,4 @@
-package listNode;
+package hot.hot150;
 
 import java.util.HashMap;
 import java.util.Map;
