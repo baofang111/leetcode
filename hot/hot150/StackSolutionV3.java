@@ -335,6 +335,7 @@ public class StackSolutionV3 {
                     result = preResult + preSign * result;
 
                     // 重置
+                    num = 0;
                 }
             }
         }
