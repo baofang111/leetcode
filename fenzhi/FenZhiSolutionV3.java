@@ -243,7 +243,6 @@ public class FenZhiSolutionV3 {
      *
      * BFS 队列版本
      *
-     *
      */
     public ListNode mergeKLists2(ListNode[] lists) {
         if (lists == null || lists.length == 0) {

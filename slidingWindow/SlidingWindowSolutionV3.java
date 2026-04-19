@@ -1,8 +1,6 @@
 package slidingWindow;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 滑动窗口 算法练习
@@ -104,54 +102,54 @@ public class SlidingWindowSolutionV3 {
      * 其中 我们使用 valid 用来标注，有多少个字符 已经满足我们 need 窗口的条件了
      */
     public String minWindow(String s, String t) {
+        // 该题的核心就是两个，使用两个窗口，window + need，对每个出现的单词次数 做汇总，当 window 和 need 单词次数一样的时候，进行数据统计
+        // 然后 我们在满足条件的时候 移动 left ,对下一个结果进行查询
+
         int sLength = s.length();
         int tLength = t.length();
 
-        // 创建两个窗口，一个 window 表示当前正在移动的，need 表示我们要满足条件的窗口，这个很重要，用来判断使用
-        Map<Character, Integer> window = new HashMap<>();
-        Map<Character, Integer> need = new HashMap<>();
+        // 创建两个窗口
+        HashMap<Character, Integer> window = new HashMap<>();
+        HashMap<Character, Integer> need = new HashMap<>();
 
-        // 初始化 need
+        // 先统计 need 窗口
         for (int i = 0; i < tLength; i++) {
             char c = t.charAt(i);
             need.put(c, need.getOrDefault(c, 0) + 1);
         }
 
-        // 设置窗口指针
-        int left = 0;
-
-        // 满足条件的位置 起始位置 + 长度
+        // 初始化我们窗口滑动所需要的值
         int start = 0;
         int length = Integer.MAX_VALUE;
 
-        // 满足条件的 字符串长度，这个是最重要的
         int valid = 0;
+        int left = 0;
 
         for (int right = 0; right < sLength; right++) {
             char c = s.charAt(right);
 
-            // 插入 window 的
             window.put(c, window.getOrDefault(c, 0) + 1);
 
-            // 如果单词满足 need 的次数，valid++
-            if (need.containsKey(c) && window.get(c).equals(need.get(c))) {
+            // 不断的寻找我们满足要求的结果值
+            if (window.get(c).equals(need.get(c))) {
                 valid++;
             }
 
             while (valid == need.size()) {
-                // 这里满足条件了，我们需要开始寻找
+                // 满足条件了，开始记录结果，如果有更小的结果值，那么继续变更
                 if (right - left + 1 < length) {
                     start = left;
                     length = right - left + 1;
                 }
 
-                // 这里需要移动窗口，寻找最小值
+                // 窗口往前移动
                 char d = s.charAt(left);
                 left++;
 
+                // 如果 need 窗口有值，那么开始变化
                 if (need.containsKey(d)) {
                     if (window.get(d).equals(need.get(d))) {
-                        // 因为位置更新了，所以 valid 需要更新
+                        // 向前移动，条件被破坏了，需要 --
                         valid--;
                     }
 
