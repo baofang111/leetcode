@@ -8,11 +8,11 @@ package hot.hot150;
  */
 public class Node {
 
-    int val;
-    Node next;
-    Node random;
+    public int val;
+    public Node next;
+    public Node random;
 
-    Node(int val) {
+    public Node(int val) {
         this.val = val;
         this.next = null;
         this.random = null;
