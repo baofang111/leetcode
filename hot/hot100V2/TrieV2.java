@@ -13,11 +13,11 @@ package hot.hot100V2;
  * @Copyright (c) © 拜耳作物科学（中国）有限公司
  * @since: 2026/05/08 11:45:13
  */
-public class Trie {
+public class TrieV2 {
 
     TrieNode root;
 
-    public Trie() {
+    public TrieV2() {
         root = new TrieNode();
     }
 
@@ -29,11 +29,11 @@ public class Trie {
         int length = word.length();
         TrieNode cur = root;
         for (int i = 0; i < length; i++) {
-            int index = word.charAt(i) - 'a';
-            if (cur.child[index] == null) {
-                cur.child[index] = new TrieNode();
+            int c = word.charAt(i) - 'a';
+            if (cur.child[c] == null) {
+                cur.child[c] = new TrieNode();
             }
-            cur = cur.child[index];
+            cur = cur.child[c];
         }
         cur.end = true;
     }
@@ -45,11 +45,11 @@ public class Trie {
         int length = word.length();
         TrieNode cur = root;
         for (int i = 0; i < length; i++) {
-            int index = word.charAt(i) - 'a';
-            if (cur.child[index] == null) {
+            int c = word.charAt(i) - 'a';
+            if (cur.child[c] == null) {
                 return false;
             }
-            cur = cur.child[index];
+            cur = cur.child[c];
         }
         return cur.end;
     }
@@ -61,11 +61,11 @@ public class Trie {
         int length = prefix.length();
         TrieNode cur = root;
         for (int i = 0; i < length; i++) {
-            int index = prefix.charAt(i) - 'a';
-            if (cur.child[index] == null) {
+            int c = prefix.charAt(i) - 'a';
+            if (cur.child[c] == null) {
                 return false;
             }
-            cur = cur.child[index];
+            cur = cur.child[c];
         }
         return true;
     }

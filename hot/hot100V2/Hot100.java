@@ -299,7 +299,7 @@ public class Hot100 {
         for (int i = 0; i < length; i++) {
             char c = s.charAt(i);
 
-            // 这里更新窗口
+            // TODO 使用 left 更新窗口，这里更新窗口
             if (map.containsKey(c) && map.get(c) >= left) {
                 left = map.get(c) + 1;
             }
@@ -1843,9 +1843,9 @@ public class Hot100 {
     /**
      * 114. 二叉树展开为链表
      * <p>
-     * 题目意思：给定一个二叉树，让我们讲这个二叉树转换成 链表
+     * 题目意思：给定一个二叉树，让我们将这个二叉树转换成 链表
      * <p>
-     * 题目解析：这题理解了意思就很简单了，他就是讲二叉树所有的放到 右节点上面，所以只要左结点有值，就放入右节点
+     * 题目解析：这题理解了意思就很简单了，他就是将二叉树所有的放到 右节点上面，所以只要左结点有值，就放入右节点
      * 其中 我们需要使用一个 pre 存储上一个节点，然后判断 上一个节点 有没有值，有值就放右节点即可
      *
      * @param root
@@ -1939,11 +1939,12 @@ public class Hot100 {
         return pathSumDFS(root, targetSum) + pathSum(root.left, targetSum) + pathSum(root.right, targetSum);
     }
 
-    public int pathSumDFS(TreeNode root, int targetSum) {
+    public int pathSumDFS(TreeNode root, long targetSum) {
         if (root == null) {
             return 0;
         }
 
+        // TODO 这里需要注意，count 需要在里面重新设置
         int count = 0;
         if (targetSum == root.val) {
             count++;
@@ -1976,7 +1977,7 @@ public class Hot100 {
         TreeNode left = lowestCommonAncestor(root.left, p, q);
         TreeNode right = lowestCommonAncestor(root.right, p, q);
 
-        // 两边都找到了，就是当前 root
+        // TODO 两边都找到了，就是当前 root， 这里一定要判断 是两边都没有找到
         if (left != null && right != null) {
             return root;
         }
@@ -2011,7 +2012,7 @@ public class Hot100 {
             return 0;
         }
 
-        // 寻找左右两边的 最大值，这里一定要和 0 作为一个比较，万一 小于 0 呢
+        // TODO 寻找左右两边的 最大值，这里一定要和 0 作为一个比较，万一 小于 0 呢
         int leftValue = Math.max(0, maxPathSumDFS(root.left));
         int rightValue = Math.max(0, maxPathSumDFS(root.right));
 
@@ -2298,7 +2299,7 @@ public class Hot100 {
     /**
      * 17. 电话号码的字母组合
      * <p>
-     * 题目意思：给定一个电话号码，数字 + 字母的组合，然后给订一个 digits，他的输入值 是 23 这种
+     * 题目意思：给定一个电话号码，数字 + 字母的组合，然后给定一个 digits，他的输入值 是 23 这种
      * 问 23能有多少种字母的组合
      * <p>
      * 题目解析：依旧 递归 + 回溯，但是这里，我们每次需要固定一个 2 然后遍历 3 的所有字母，然后再遍历 2 再次遍历 3 这样拿到我们所有的结果值
@@ -2343,7 +2344,7 @@ public class Hot100 {
 
             path.append(c);
 
-            // 注意 这里也一定是 index + 1, 2 3 锚定了 2 ，我们就需要对 3 进行再次添加
+            //，我们就需要对 3 进行再次添加 注意 这里也一定是 index + 1, 2 3 锚定了 2
             letterCombinationsDFS(digits, index + 1, path, result);
 
             path.deleteCharAt(path.length() - 1);
@@ -2379,19 +2380,20 @@ public class Hot100 {
         }
 
         for (int i = index; i < candidates.length; i++) {
+            // TODO 这里一定要 num 去判断
             int num = candidates[i];
             if (num > target) {
                 continue;
             }
 
-            sum += candidates[i];
-            path.add(candidates[i]);
+            sum += num;
+            path.add(num);
 
             // 注意这里可以重复，所以传入的还是 index
             combinationSumDFS(candidates, i, sum, target, path, result);
 
             // 回溯
-            sum -= candidates[i];
+            sum -= num;
             path.removeLast();
         }
 
@@ -2402,7 +2404,7 @@ public class Hot100 {
      * <p>
      * 题目意思：给定一个数字，让我们生成所有的括号 组合 (()) ()()
      * <p>
-     * 题目解析：其实就两个条件，一个是 left < n ，一个是 right <= left
+     * 题目解析：其实就两个条件，一个是 left < n ，一个是 right < left
      *
      * @param n
      * @return
@@ -2519,7 +2521,7 @@ public class Hot100 {
         }
 
         for (int i = index; i < s.length(); i++) {
-            // 开始分割，这里也是这题最重要的部分
+            // TODO 开始分割，这里也是这题最重要的部分
             String sub = s.substring(index, i + 1);
             if (isHW(sub)) {
                 path.add(sub);
@@ -2802,6 +2804,7 @@ public class Hot100 {
                 right = mid;
             }
         }
+
         return nums[left];
     }
 
@@ -2965,7 +2968,7 @@ public class Hot100 {
                 }
             } else {
                 // 这里是字母
-                path.toString();
+                path.append(c);
             }
         }
 
@@ -3168,7 +3171,7 @@ public class Hot100 {
 
         for (int i = 0; i < length; i++) {
             if (i > max) {
-                // 最大的地方 都走不出去
+                // TODO 最大的地方 都走不出去
                 return false;
             }
             max = Math.max(max, i + nums[i]);
@@ -3242,8 +3245,754 @@ public class Hot100 {
         return result;
     }
 
+    ///////////////////////////////////////// 动态规划 ///////////////////////////////////////////
+
+
+    /**
+     * 70. 爬楼梯
+     * <p>
+     * 题目意思：给定一个 n 阶的楼梯，问我们能有多少种方式可以爬到楼顶。
+     * 我们一次只能 爬 1 or 2 个台阶
+     * <p>
+     * 题目解析：动态规划经典题 dp[n] = dp[n-1] + dp[n-2]
+     *
+     * @param n
+     * @return
+     */
+    public int climbStairs(int n) {
+        if (n <= 1) {
+            return n;
+        }
+
+        int[] dp = new int[n];
+        dp[0] = 1;
+        dp[1] = 2;
+
+        for (int i = 2; i < n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+
+        return dp[n - 1];
+    }
+
+    /**
+     * 118. 杨辉三角
+     * <p>
+     * 题目意思：给定要觉数字，让我们构建杨辉三角
+     * 什么是杨辉三角？ 左右两边都是 1 ，然后下面的是 dp[i] = 上面的 两个 i - 1 + i 位置的相加
+     * <p>
+     * 题目解析：我们直接暴力遍历相加即可
+     *
+     * @param numRows
+     * @return
+     */
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (numRows == 0) {
+            return result;
+        }
+
+        for (int i = 0; i < numRows; i++) {
+            List<Integer> subResult = new ArrayList<>();
+            for (int j = 0; j <= i; j++) {
+                if (j == 0 || j == i) {
+                    subResult.add(1);
+                } else {
+                    subResult.add(result.get(i - 1).get(j - 1) + result.get(i - 1).get(j));
+                }
+            }
+            result.add(subResult);
+        }
+
+        return result;
+    }
+
+    /**
+     * 198. 打家劫舍
+     * <p>
+     * 题目意思：给定一个 nums ,里面代表的是每一家藏有的现金，我们要看能偷到的最大的金额，注意 不能连续偷
+     * <p>
+     * 题目解析：典型的 DP 问题，因为不能连续投，所以 dp[n] = n 个房间后能偷到的最大的金额
+     * dp[n] = 偷当前房间 + 不偷当前房间
+     * 偷当前房间 = dp[n - 2] + nums[n]
+     * 不偷当前房间( 前一个房间已经偷了 ) = dp[n - 1]
+     *
+     * @param nums
+     * @return
+     */
+    public int rob(int[] nums) {
+        int length = nums.length;
+        if (length == 1) {
+            return nums[0];
+        }
+
+        // 一定要初始化
+        int[] dp = new int[length];
+        dp[0] = nums[0];
+        // 要不偷第一家，要不偷第二家
+        dp[1] = Math.max(nums[0], nums[1]);
+
+        for (int i = 2; i < length; i++) {
+            dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+
+        return dp[length - 1];
+    }
+
+    /**
+     * 279. 完全平方数
+     * <p>
+     * 题目意思： 给定一个数字，让我们返回 和 = n 的完全平方数的最少数量
+     * <p>
+     * 题目解析：依旧典型的 DP 问题
+     * dp[n] = min ( dp[i - j*j] + 1 )
+     * 举个例子
+     * dp[11] = dp[10] + 1 * 1
+     * dp[11] = dp[7] + 2 * 2
+     * dp[11] = dp[2] + 3 * 3
+     * 所以我们就能得到我们的这个动态转移方程
+     * dp[n] = min(dp[i - j*j] + 1)
+     * <p>
+     * 那么我们就能知道，这是一个 二层嵌套 foreach
+     * foreach = i=1,i++
+     * foreach = j=1, j*j<=i
+     *
+     * @param n
+     * @return
+     */
+    public int numSquares(int n) {
+        int[] dp = new int[n + 1];
+        // 初始化
+        Arrays.fill(dp, Integer.MAX_VALUE);
+
+        // 一定要从 1 开始计算
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j * j <= i; j++) {
+                dp[i] = Math.min(dp[i - j * j] + 1, dp[i]);
+            }
+        }
+        return dp[n];
+    }
+
+
+    /**
+     * 322. 零钱兑换
+     * <p>
+     * 题目意思：给定一个一个 硬币组成的 数组 coins，和一个 金额 amount
+     * 问我们这些硬币组成 amount 所需要的最小硬币数
+     * <p>
+     * 题目解析：这是一题典型的 完全背包问题，完全背包，就是，背包里面的金额可以一直使用
+     * 动态转移方程就是 coin
+     * dp[i] = min (dp[i - coin] + 1, dp[i]  )
+     *
+     * @param coins
+     * @param amount
+     * @return
+     */
+    public int coinChange(int[] coins, int amount) {
+        // 初始化DP TODO 这里初始化是 amount + 1
+        int[] dp = new int[amount + 1];
+        // 这里是判断能不能完全组成我们的 amount
+        Arrays.fill(dp, amount + 1);
+
+        // 这里一定要初始化 dp[0]
+        dp[0] = 0;
+
+        // 开始完全背包寻找
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (i >= coin) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+
+    /**
+     * 139. 单词拆分
+     * <p>
+     * 题目意思：给定一个单词 s,然后给定我们一个单词的说数组 wordDict，问 我们能不能通过 wordDict 组成 单词 s
+     * <p>
+     * 题目解析：依旧典型的 dp 问题，动态状态方程是 dp[n] S 的第 N 个位置能不能由 wordDict 组成
+     *
+     * @param s
+     * @param wordDict
+     * @return
+     */
+    public boolean wordBreak(String s, List<String> wordDict) {
+        int length = s.length();
+
+        boolean[] dp = new boolean[length + 1];
+        dp[0] = true;
+
+        for (int i = 0; i <= length; i++) {
+            for (int j = 0; j < i; j++) {
+                // 二层循环是为了 寻找 s 中的单词
+                if (dp[j] && wordDict.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                }
+            }
+        }
+
+        return dp[length];
+    }
+
+    /**
+     * 300. 最长递增子序列
+     * <p>
+     * 题目意思：给定一个数组，让我们拿到这个数组的 最长递增 子序列
+     * 比如 5 1234 那么他的最长递增子序列就是 1234 = 4
+     * <p>
+     * 题目解析：依旧 DP，我们判断，只要 nums[i] > nums[i - 1] 那么 递增子序列就需要 + 1
+     * 那么 dp[n] 代表的就是 N个位置下的最长递增子序列是多少
+     * if（nums[i] > nums[i - 1] ）{
+     * dp[i] = max(dp[i - 1] + 1)
+     * }
+     * <p>
+     * 记住初始化
+     *
+     * @param nums
+     * @return
+     */
+    public int lengthOfLIS(int[] nums) {
+        int length = nums.length;
+        if (length == 0) {
+            return 0;
+        }
+
+        int ans = 0;
+        int[] dp = new int[length];
+
+        for (int i = 0; i < length; i++) {
+            dp[i] = 1;
+            // 二次循环寻找每次的最大值
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            ans = Math.max(ans, dp[i]);
+        }
+
+        return ans;
+    }
+
+    /**
+     * 152. 乘积最大子数组
+     * <p>
+     * 题目意思：给定一个数组，让我们得到 这个数组的乘积最大的子数组
+     * <p>
+     * 题目解析：依旧是 DP
+     * 我们需要记录两个值，一个最大值，一个最小值
+     * 然后 每次遍历一个值之后，我们都需要将这个值和 最大值 和 最小值进行 相乘
+     * <p>
+     * 然后拿到最大值
+     *
+     * @param nums
+     * @return
+     */
+    public int maxProduct(int[] nums) {
+        int length = nums.length;
+        if (length == 0) {
+            return 0;
+        }
+
+        int max = nums[0];
+        int min = nums[0];
+        int ans = nums[0];
+
+        for (int i = 1; i < length; i++) {
+            int num = nums[i];
+
+            int tempMax = max;
+            int tempMin = min;
+
+            // TODO 注意，这里需要和自己做比较，因为自己可能也是最大值
+            min = Math.min(num, Math.min(tempMax * num, tempMin * num));
+            max = Math.max(num, Math.max(tempMax * num, tempMin * num));
+
+            ans = Math.max(ans, max);
+        }
+
+        return ans;
+    }
+
+    /**
+     * 416. 分割等和子集
+     * <p>
+     * 题目意思：给定一个 数组 问我们能不能将这个数组分割成两个 和 一样的子数组
+     * <p>
+     * 题目解析：这就是一题 0/1 背包问题，累加所有的值，先看是 奇数还是偶数
+     * 奇数：肯定不行
+     * 偶数：sum / 2 = target ，然后我们从 数组里面 按照 0/1 背包，看能不能找到 这个 target 的值
+     *
+     * @param nums
+     * @return
+     */
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+
+        if (sum % 2 == 1) {
+            return false;
+        }
+
+        // 开始 0/1 背包问题
+        int target = sum / 2;
+
+        boolean[] dp = new boolean[target + 1];
+        dp[0] = true;
+
+        // 我们要从 nums 中，寻找 target，记住 0/1 背包不能重复使用，所以需要从后往前遍历
+        for (int num : nums) {
+            for (int i = target; i >= num; i--) {
+                // TODO 当前位置 = 拿 or 不拿
+                dp[i] = dp[i] || dp[i - num];
+            }
+        }
+
+        return dp[target];
+    }
+
+    /**
+     * 32. 最长有效括号
+     * <p>
+     * 题目意思：给定一个字符串 s, 比如 ((), 问我们能组成的最长有效括号是多长
+     * <p>
+     * 题目解析：使用 栈去解答该题
+     * 遇到 ( 就入栈
+     * 遇到 ) 就出栈，但是这里出栈需要注意一下，需要再次判断 栈内有没有值了
+     *
+     * @param s
+     * @return
+     */
+    public int longestValidParentheses(String s) {
+        int length = s.length();
+
+        // 这里一定要初始化一个 -1
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(-1);
+
+        int ans = 0;
+
+        for (int i = 0; i < length; i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                // 这里需要入栈
+                stack.push(i);
+            } else {
+                // 这里是 ) 需要出栈
+                stack.pop();
+                if (stack.isEmpty()) {
+                    // 这里走完了，表示这种情况 )()(),我们需要再次入栈，防止后面判断长度的时候 找不到
+                    stack.push(i);
+                } else {
+                    ans = Math.max(ans, i - stack.peek());
+                }
+            }
+        }
+
+        return ans;
+    }
+
+
+    /**
+     * 62. 不同路径
+     * <p>
+     * 题目意思：给定一个一个 m * n 的 网格，我们从开始出发，问到 m,n 最多有多少条路线
+     * <p>
+     * 题目解析：典型的 二维动态规划
+     * dp[m][n] 只能由 左边 和 上面走过来
+     * 所以
+     * dp[m][n] = dp[m][n-1] + dp[m-1][n]
+     * 然后初始化 第一行 + 第一列 即可
+     * <p>
+     * 如果是 不同路径 Ⅱ 这一题，遇到障碍物，需要将这条路径的结果值 dp[m][n] 设置成 0
+     *
+     * @param m
+     * @param n
+     * @return
+     */
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+
+        // 初始化第一行 + 第一列
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int j = 0; j < n; j++) {
+            dp[0][j] = 1;
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+
+        return dp[m - 1][n - 1];
+    }
+
+    /**
+     * 64. 最小路径和
+     * <p>
+     * 题目意思：给定一个二维数组，为我们从起始点到终点的最小 路劲和 是多少
+     * <p>
+     * 题目解析：这题和 不同路径很像，只不过 这题需要 对 左边 + 上边 取一个最小
+     * dp[m][n] = min(dp[m-1][n], dp[m][n-1]) + val
+     *
+     * @param grid
+     * @return
+     */
+    public int minPathSum(int[][] grid) {
+        int n = grid.length;
+        int m = grid[0].length;
+        if (n == 0 || m == 0) {
+            return 0;
+        }
+
+        int[][] dp = new int[n][m];
+        dp[0][0] = grid[0][0];
+
+        // 第一行 + 第一列初始化
+        for (int i = 1; i < n; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+        for (int j = 1; j < m; j++) {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 1; j < m; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+
+        return dp[n - 1][m - 1];
+    }
+
+
+    /**
+     * 5. 最长回文子串
+     * <p>
+     * 题目意思：给定一个字符串，问我们 这个字符串的 最长回文子串是多少
+     * <p>
+     * 题目解析：我们使用 中心扩散发，遍历，然后每次通过奇偶数不同的位置开始扩散，寻找当前 i 位置的最长回文长度
+     * 然后再通过这个长度，更新我们的 start + length
+     *
+     * @param s
+     * @return
+     */
+    public String longestPalindrome(String s) {
+        int n = s.length();
+        if (n == 0) {
+            return "";
+        }
+
+        int start = 0;
+        int end = 0;
+
+        for (int i = 0; i < n; i++) {
+            int max1 = findHwLength(s, i, i);
+            int max2 = findHwLength(s, i, i + 1);
+
+            // 奇偶数下那个回文最长
+            int max = Math.max(max1, max2);
+            if (max > (end - start)) {
+                // 需要重新更新 start + end，注意这里一定是 max-1
+                start = i - (max - 1) / 2;
+                end = i + max / 2;
+            }
+        }
+
+        return s.substring(start, end + 1);
+    }
+
+    private int findHwLength(String s, int left, int right) {
+        int length = s.length();
+        while (left >= 0 && right >= 0 && left < length && right < length && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
+        }
+        // babcc - 3-0
+        return (right - 1) - (left + 1) + 1;
+    }
+
+    /**
+     * 1143. 最长公共子序列
+     * <p>
+     * 题目意思：给定两个字符串 text1 + text2, 问这两个字符串的最长公共子序列是多少
+     * <p>
+     * 题目解析:依旧是典型的二维动态规划
+     * 如果 text1 + text2 当前值一样，那么
+     * dp[i][j] = dp[i-1][j-1] + 1
+     * 如果不一样，那么就要取最大的
+     * dp[i][j] = max (dp[i - 1][j], dp[i][j - 1])
+     *
+     * @param text1
+     * @param text2
+     * @return
+     */
+    public int longestCommonSubsequence(String text1, String text2) {
+        int n = text1.length();
+        int m = text2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+        dp[0][0] = 0;
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        return dp[n][m];
+    }
+
+    /**
+     * 72. 编辑距离
+     * <p>
+     * 题目意思：给定两个字符串，问 从 word1 转换到 word2 需要多少步骤
+     * 只能 插入 + 删除 + 替换一个元素
+     * <p>
+     * 题目解析：这题和 最长公共子序列基本差不多，只不过 状态转移方程不太一样
+     * dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+     * 分别对应 删除 + 插入 + 替换
+     *
+     * @param word1
+     * @param word2
+     * @return
+     */
+    public int minDistance(String word1, String word2) {
+        int n = word1.length();
+        int m = word2.length();
+
+        int[][] dp = new int[n + 1][m + 1];
+        // 初始化 dp
+        for (int i = 0; i <= n; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j <= m; j++) {
+            dp[0][j] = j;
+        }
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(
+                            dp[i - 1][j - 1],
+                            Math.min(dp[i - 1][j], dp[i][j - 1])
+                    ) + 1;
+                }
+            }
+        }
+
+        return dp[n][m];
+    }
+
+    ///////////////////////////////////////// 技巧 ///////////////////////////////////////////
+
+
+    /**
+     * 136. 只出现一次的数字
+     * <p>
+     * 题目意思：给定一个 nums,除了一个元素只出现一次，其他的都只出现 2次，找出这个一个的值
+     * <p>
+     * 题目解析：a^a = 0 我们直接 ^= 下去就行了
+     *
+     * @param nums
+     * @return
+     */
+    public int singleNumber(int[] nums) {
+        int result = 0;
+        for (int num : nums) {
+            result ^= num;
+        }
+        return result;
+    }
+
+    /**
+     * 169. 多数元素
+     * <p>
+     * 题目意思：给定一个数组，拿出里面占多数的元素
+     * <p>
+     * 题目解析：直接 排序之后取中间的就行
+     *
+     * @param nums
+     * @return
+     */
+    public int majorityElement(int[] nums) {
+        Arrays.sort(nums);
+        return nums[nums.length / 2];
+    }
+
+    /**
+     * 75. 颜色分类
+     * <p>
+     * 题目意思：给定一个数组，里面 0 1 2 分别代表 红 白 蓝
+     * 让我们将数组里面 按照 红 白 蓝 排好序
+     * <p>
+     * 题目解析：使用指针即可
+     * bLue = 指向后面的指针
+     * red = 指向前面的指针
+     * cur = 当前指针
+     *
+     * @param nums
+     */
+    public void sortColors(int[] nums) {
+        int length = nums.length;
+        if (length == 0) {
+            return;
+        }
+
+        int blue = length - 1;
+        int red = 0;
+        int cur = 0;
+
+        while (cur <= blue) {
+            int num = nums[cur];
+            if (num == 0) {
+                swap(nums, cur, red);
+                red++;
+                cur++;
+            } else if (num == 1) {
+                cur++;
+            } else {
+                swap(nums, cur, blue);
+                blue--;
+                // 注意这里 cur 不能++ ，不然元素就漏了
+            }
+        }
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+
+    /**
+     * 31. 下一个排列
+     * <p>
+     * 题目意思：给定一个数组，让我们找到他的下一个排列是什么
+     * <p>
+     * 题目解析：往后找，找到递增数序的 第一个下降的元素，然后找到这个元素之后，从后面继续往前寻找，找到第一个比这个元素大的元素，然后 替换位置即可
+     * 然后再对后面的做一个反转
+     * <p>
+     * 核心就是，从后完全找，找到第一个 下降的数据
+     * 然后拿到这个位置，再从后往前找，找到第一个 比这个下降数字更大的数据
+     * 然后 这两个元素进行替换
+     * 然后再将 后面部分整个旋转
+     *
+     * @param nums
+     */
+    public void nextPermutation(int[] nums) {
+        int length = nums.length;
+        int start = -1;
+        for (int i = length - 2; i >= 0; i--) {
+            if (nums[i] < nums[i + 1]) {
+                start = i;
+                break;
+            }
+        }
+
+        if (start >= 0) {
+            // 然后开始倒数寻找第一个比当前 start 大的数据
+            int cur = nums[start];
+            int end = -1;
+            for (int i = length - 1; i >= 0; i--) {
+                if (nums[i] > cur) {
+                    end = i;
+                    break;
+                }
+            }
+
+            // 替换 start + end 的 元素
+            swap2(nums, start, end);
+        }
+
+        // 再次旋转后面的数据
+        reverse2(nums, start + 1, length - 1);
+    }
+
+    private void swap2(int[] nums, int i, int j) {
+        if (j >= 0 && i >= 0) {
+            int temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+    }
+
+    private void reverse2(int[] nums, int left, int right) {
+        while (left < right) {
+            int temp = nums[left];
+            nums[left] = nums[right];
+            nums[right] = temp;
+            left++;
+            right--;
+        }
+    }
+
+    /**
+     * 287. 寻找重复数
+     * <p>
+     * 题目意思：给定一个数组，里面有一个重复数
+     * 让我们找到这个重复数
+     * <p>
+     * 题目解析：我们直接将数组 假定成一个 链表就行了，数组的元素表示下标，这样，如果出现循环链表，那个数，就是我们要找的数据
+     *
+     * @param nums
+     * @return
+     */
+    public int findDuplicate(int[] nums) {
+        int slow = nums[0];
+        int fast = nums[nums[0]];
+
+        while (slow != fast) {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        }
+
+        // 再重新开始找
+        int p = 0;
+        int q = slow;
+        while (p != q) {
+            p = nums[p];
+            q = nums[q];
+        }
+
+        return p;
+    }
+
     public static void main(String[] args) {
         Hot100 hot100 = new Hot100();
+
+        HashMap<Object, Object> map = new HashMap<>();
+
+
+        String word = "aaa";
+
+        List<int[]> result =  new ArrayList();
+
+
+        System.out.println('c' - 'a');
+
+        Set<Integer> set = new HashSet();
+
+
+
+
 
 //        hot100.subarraySum(new int[]{1, 2, 3}, 3);
 
